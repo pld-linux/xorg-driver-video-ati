@@ -24,7 +24,13 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 X.org video drivers for ATI adapters:
-- ati driver which supports older devices like Mach32/Mach64,
+- ati driver which supports most of chips from VGAWonder series
+  (18800, 18800-1, 28800-2, 28800-4, 28800-5, 28800-6), Mach32 series
+  (68800-3, 68800-6, 68800AX, 68800LX) and Mach64 series (88800GX-C,
+  88800GX-D, 88800GX-E, 88800GX-F, 88800CX, 264CT, 264ET, 264VT, 264GT
+  (3D Rage), 264VT-B, 264VT3, 264VT4, 264GT-B (3D Rage II), 3D Rage
+  IIc, 3D Rage Pro, 3D Rage LT, 3D Rage LT Pro, 3D Rage XL, 3D Rage
+  XC, 3D Rage Mobility (including the -M and -P variants)),
 - r128 driver which supports all ATI Rage 128 based video cards
   including the Rage Fury AGP 32MB, the XPERT 128 AGP 16MB and the
   XPERT 99 AGP 8MB,
@@ -46,7 +52,13 @@ X.org video drivers for ATI adapters:
 
 %description -l pl
 Sterowniki obrazu X.org do kart graficznych ATI:
-- sterownik ati obs³uguj±cy starsze karty, jak np. Mach32/Mach64,
+- sterownik ati obs³uguj±cy wiêkszo¶æ kart z serii VGAWonder (18800,
+  18800-1, 28800-2, 28800-4, 28800-5, 28800-6), Mach32 (68800-3,
+  68800-6, 68800AX, 68800LX) oraz Mach64 (88800GX-C, 88800GX-D,
+  88800GX-E, 88800GX-F, 88800CX, 264CT, 264ET, 264VT, 264GT (3D Rage),
+  264VT-B, 264VT3, 264VT4, 264GT-B (3D Rage II), 3D Rage IIc, 3D Rage
+  Pro, 3D Rage LT, 3D Rage LT Pro, 3D Rage XL, 3D Rage XC, 3D Rage
+  Mobility (w³±cznie z wariantami -M i -P)),
 - sterownik r128 obs³uguj±cy wszystkie karty graficzne oparte na
   uk³adzie ATI Rage 128, w³±cznie z Rage Fury AGP 32MB, XPERT 128 AGP
   16MB i XPERT 99 AGP 8MB,
