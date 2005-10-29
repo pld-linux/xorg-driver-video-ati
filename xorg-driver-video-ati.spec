@@ -1,5 +1,5 @@
-Summary:	ATI video adapters driver
-Summary(pl):	Sterownik do kart graficznych ATI
+Summary:	X.org video drivers for ATI adapters
+Summary(pl):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
 Version:	6.5.6.1
 Release:	0.1
@@ -23,10 +23,48 @@ BuildRequires:	xorg-xserver-server-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-ATI video adapters driver.
+X.org video drivers for ATI adapters:
+- ati driver which supports older devices like Mach32/Mach64,
+- r128 driver which supports all ATI Rage 128 based video cards
+  including the Rage Fury AGP 32MB, the XPERT 128 AGP 16MB and the
+  XPERT 99 AGP 8MB,
+- radeon driver which supports PCI and AGP video cards based on the
+  following ATI chips: R100 (Radeon 7200), RV100 (Radeon 7000(VE),
+  M6), RS100 (Radeon IGP320(M)), RV200 (Radeon 7500, M7, FireGL 7800),
+  RS200 (Radeon IGP330(M)/IGP340(M)), RS250 (Radeon Mobility 7000
+  IGP), R200 (Radeon 8500, 9100, FireGL 8800/8700), RV250 (Radeon
+  9000PRO/9000, M9), RS300 (Radeon 9100 IGP), RS350 (Radeon 9200 IGP),
+  RS400 (Radeon XPRESS 200/200M IGP), RV280 (Radeon 9200PRO/9200/
+  9200SE, M9+); additionally it partially (2D only) supports video
+  cards based on the following chips: R300 (Radeon 9700PRO/9700/
+  9500PRO/9500/9600TX, FireGL X1/Z1), R350 (Radeon 9800PRO/9800SE/
+  9800, FireGL X2), R360 (Radeon 9800XT), RV350 (Radeon 9600PRO/
+  9600SE/9600, M10/M11, FireGL T2), RV360 (Radeon 9600XT), RV370
+  (Radeon X300, M22), RV380 (Radeon X600), RV410 (Radeon X700, M26
+  PCIE), R420 (Radeon X800 AGP), R423/R430 (Radeon X800, M28 PCIE),
+  R480/R481 (Radeon X850 PCIE/AGP).
 
 %description -l pl
-Sterownik do kart graficznych ATI.
+Sterowniki obrazu X.org do kart graficznych ATI:
+- sterownik ati obs³uguj±cy starsze karty, jak np. Mach32/Mach64,
+- sterownik r128 obs³uguj±cy wszystkie karty graficzne oparte na
+  uk³adzie ATI Rage 128, w³±cznie z Rage Fury AGP 32MB, XPERT 128 AGP
+  16MB i XPERT 99 AGP 8MB,
+- sterownik radeon obs³uguj±cy karty graficzne PCI i AGP oparte na
+  nastêpuj±cych uk³adach ATI: R100 (Radeon 7200), RV100 (Radeon
+  7000(VE), M6), RS100 (Radeon IGP320(M)), RV200 (Radeon 7500, M7,
+  FireGL 7800), RS200 (Radeon IGP330(M)/IGP340(M)), RS250 (Radeon
+  Mobility 7000 IGP), R200 (Radeon 8500, 9100, FireGL 8800/8700),
+  RV250 (Radeon 9000PRO/9000, M9), RS300 (Radeon 9100 IGP), RS350
+  (Radeon 9200 IGP), RS400 (Radeon XPRESS 200/200M IGP), RV280 (Radeon
+  9200PRO/9200/9200SE, M9+); a ponadto czê¶ciowo (tylko 2D)
+  obs³uguj±cy karty oparte na nastêpuj±cych uk³adach: R300 (Radeon
+  9700PRO/9700/9500PRO/9500/9600TX, FireGL X1/Z1), R350 (Radeon
+  9800PRO/9800SE/9800, FireGL X2), R360 (Radeon 9800XT), RV350 (Radeon
+  9600PRO/9600SE/9600, M10/M11, FireGL T2), RV360 (Radeon 9600XT),
+  RV370 (Radeon X300, M22), RV380 (Radeon X600), RV410 (Radeon X700,
+  M26 PCIE), R420 (Radeon X800 AGP), R423/R430 (Radeon X800, M28
+  PCIE), R480/R481 (Radeon X850 PCIE/AGP).
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
@@ -57,6 +95,13 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc README.ati README.r128
-%attr(755,root,root) %{_libdir}/xorg/modules/drivers/*.so
-%attr(755,root,root) %{_libdir}/xorg/modules/multimedia/*.so
-%{_mandir}/man4/*.4x*
+%attr(755,root,root) %{_libdir}/xorg/modules/drivers/ati_drv.so
+%attr(755,root,root) %{_libdir}/xorg/modules/drivers/atimisc_drv.so
+%attr(755,root,root) %{_libdir}/xorg/modules/drivers/r128_drv.so
+%attr(755,root,root) %{_libdir}/xorg/modules/drivers/radeon_drv.so
+%attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre200_drv.so
+%attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre_detect_drv.so
+%attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre_drv.so
+%{_mandir}/man4/ati.4x*
+%{_mandir}/man4/r128.4x*
+%{_mandir}/man4/radeon.4x*
