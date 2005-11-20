@@ -1,25 +1,29 @@
 Summary:	X.org video drivers for ATI adapters
 Summary(pl):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
-Version:	6.5.6.1
+Version:	6.5.7
 Release:	0.1
 License:	MIT
 Group:		X11/Applications
-Source0:	http://xorg.freedesktop.org/releases/X11R7.0-RC1/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	2dfc216efba787ce8b985dcb84251031
+Source0:	http://xorg.freedesktop.org/releases/X11R7.0-RC2/driver/xf86-video-ati-%{version}.tar.bz2
+# Source0-md5:	54b63c143d71096c9a3cddae9f1917bb
 URL:		http://xorg.freedesktop.org/
-BuildRequires:	Mesa-devel
+BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.57
 BuildRequires:	automake
 BuildRequires:	libdrm-devel
 BuildRequires:	libtool
 BuildRequires:	pkgconfig >= 1:0.19
+BuildRequires:	xorg-proto-fontsproto-devel
+BuildRequires:	xorg-proto-randrproto-devel
+BuildRequires:	xorg-proto-renderproto-devel
 BuildRequires:	xorg-proto-videoproto-devel
+BuildRequires:	xorg-proto-xextproto-devel
 BuildRequires:	xorg-proto-xf86driproto-devel
 BuildRequires:	xorg-proto-xf86miscproto-devel
 BuildRequires:	xorg-proto-xineramaproto-devel
 BuildRequires:	xorg-util-util-macros >= 0.99.1
-BuildRequires:	xorg-xserver-server-devel
+BuildRequires:	xorg-xserver-server-devel >= 0.99.3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -106,7 +110,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc README.ati README.r128
+%doc ChangeLog README.ati README.r128
 %attr(755,root,root) %{_libdir}/xorg/modules/drivers/ati_drv.so
 %attr(755,root,root) %{_libdir}/xorg/modules/drivers/atimisc_drv.so
 %attr(755,root,root) %{_libdir}/xorg/modules/drivers/r128_drv.so
