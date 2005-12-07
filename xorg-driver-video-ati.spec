@@ -1,17 +1,17 @@
 Summary:	X.org video drivers for ATI adapters
 Summary(pl):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
-Version:	6.5.7
+Version:	6.5.7.1
 Release:	0.1
 License:	MIT
 Group:		X11/Applications
-Source0:	http://xorg.freedesktop.org/releases/X11R7.0-RC2/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	54b63c143d71096c9a3cddae9f1917bb
+Source0:	http://xorg.freedesktop.org/releases/X11R7.0-RC3/driver/xf86-video-ati-%{version}.tar.bz2
+# Source0-md5:	7c584d62026d8ac84b7624f8bb4c8340
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.57
 BuildRequires:	automake
-BuildRequires:	libdrm-devel
+BuildRequires:	libdrm-devel >= 2.0
 BuildRequires:	libtool
 BuildRequires:	pkgconfig >= 1:0.19
 BuildRequires:	xorg-proto-fontsproto-devel
@@ -22,7 +22,7 @@ BuildRequires:	xorg-proto-xextproto-devel
 BuildRequires:	xorg-proto-xf86driproto-devel
 BuildRequires:	xorg-proto-xf86miscproto-devel
 BuildRequires:	xorg-proto-xineramaproto-devel
-BuildRequires:	xorg-util-util-macros >= 0.99.1
+BuildRequires:	xorg-util-util-macros >= 0.99.2
 BuildRequires:	xorg-xserver-server-devel >= 0.99.3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -100,8 +100,7 @@ Sterowniki obrazu X.org do kart graficznych ATI:
 rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT \
-	drivermandir=%{_mandir}/man4
+	DESTDIR=$RPM_BUILD_ROOT
 
 rm -f $RPM_BUILD_ROOT%{_libdir}/xorg/modules/*/*.la
 
@@ -118,6 +117,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre200_drv.so
 %attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre_detect_drv.so
 %attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre_drv.so
-%{_mandir}/man4/ati.4x*
-%{_mandir}/man4/r128.4x*
-%{_mandir}/man4/radeon.4x*
+%{_mandir}/man4/ati.4*
+%{_mandir}/man4/r128.4*
+%{_mandir}/man4/radeon.4*
