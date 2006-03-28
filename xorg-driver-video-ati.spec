@@ -1,12 +1,13 @@
 Summary:	X.org video drivers for ATI adapters
 Summary(pl):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
-Version:	6.5.7.3
+%define	snap	20060328
+Version:	0.1
 Release:	0.1
 License:	MIT
 Group:		X11/Applications
-Source0:	http://xorg.freedesktop.org/releases/X11R7.0/src/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	a87420414681c53681a330b55ffb04ea
+Source0:	xf86-video-ati-%{snap}.tar.gz
+# Source0-md5:	63bad6a0e16f41f4173f7cf8de5ab42b
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.57
@@ -84,7 +85,7 @@ Sterowniki obrazu X.org do kart graficznych ATI:
   PCIE), R480/R481 (Radeon X850 PCIE/AGP).
 
 %prep
-%setup -q -n xf86-video-ati-%{version}
+%setup -q -n xf86-video-ati
 
 %build
 %{__libtoolize}
