@@ -2,7 +2,7 @@ Summary:	X.org video drivers for ATI adapters
 Summary(pl):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
 %define	snap	20060402
-Version:	0.1
+Version:	0.3
 Release:	0.1
 License:	MIT
 Group:		X11/Applications
