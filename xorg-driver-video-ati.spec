@@ -1,13 +1,13 @@
 Summary:	X.org video drivers for ATI adapters
 Summary(pl):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
-%define	snap	20060402
+%define	snap	20060328
 Version:	0.1
 Release:	0.%{snap}.1
 License:	MIT
 Group:		X11/Applications
 Source0:	xf86-video-ati-%{snap}.tar.gz
-# Source0-md5:	aded2246f304e5beced8edd64097f522
+# Source0-md5:	63bad6a0e16f41f4173f7cf8de5ab42b
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.57
