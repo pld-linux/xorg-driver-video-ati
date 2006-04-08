@@ -3,7 +3,7 @@ Summary(pl):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
 %define	snap	20060402
 Version:	0.3
-Release:	0.1
+Release:	0.2
 License:	MIT
 Group:		X11/Applications
 Source0:	xf86-video-ati-%{snap}.tar.gz
