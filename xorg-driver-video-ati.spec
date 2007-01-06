@@ -25,7 +25,7 @@ BuildRequires:	xorg-proto-xineramaproto-devel
 BuildRequires:	xorg-util-util-macros >= 0.99.2
 BuildRequires:	xorg-xserver-server-devel >= 1.0.99.901
 Requires:	xorg-xserver-server >= 1.0.99.901
-Obsoletes:	X11-driver-ati
+Obsoletes:	X11-driver-ati < 1:7.0.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
