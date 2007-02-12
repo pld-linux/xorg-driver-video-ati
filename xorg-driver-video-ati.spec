@@ -1,5 +1,5 @@
 Summary:	X.org video drivers for ATI adapters
-Summary(pl.UTF-8):   Sterowniki obrazu X.org do kart graficznych ATI
+Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
 Version:	6.6.3
 Release:	1
