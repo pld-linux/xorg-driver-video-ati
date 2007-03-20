@@ -1,3 +1,7 @@
+#
+# Conditional build:
+%bcond_with	tv_output	# exprimental tv output support
+
 Summary:	X.org video drivers for ATI adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
@@ -7,6 +11,8 @@ License:	MIT
 Group:		X11/Applications
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
 # Source0-md5:	f6d559f9d20f61567d381916b376590f
+# http://megahurts.dk/rune/stuff/xorg7.1-6.6.3-tv_output.patch.gz
+Patch0:		xorg7.1-6.6.3-tv_output.patch
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.57
@@ -86,6 +92,9 @@ Sterowniki obrazu X.org do kart graficznych ATI:
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
+%if %{with tv_output}
+%patch0 -p1
+%endif
 
 %build
 %{__libtoolize}
