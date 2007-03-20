@@ -128,6 +128,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre200_drv.so
 %attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre_detect_drv.so
 %attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre_drv.so
+%if %{with tv_output}
+%doc src/README.tvout
+%{_libdir}/xorg/modules/multimedia/theater_out_drv.so
+%endif
 %{_mandir}/man4/ati.4*
 %{_mandir}/man4/r128.4*
 %{_mandir}/man4/radeon.4*
