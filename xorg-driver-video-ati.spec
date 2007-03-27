@@ -5,12 +5,12 @@
 Summary:	X.org video drivers for ATI adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
-Version:	6.6.3
+Version:	6.6.191
 Release:	1%{?with_tv_output:.tv}
 License:	MIT
 Group:		X11/Applications
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	f6d559f9d20f61567d381916b376590f
+# Source0-md5:	90049fe51aaef1806dcc2e03ff60858f
 # http://megahurts.dk/rune/stuff/xorg7.1-6.6.3-tv_output.patch.gz
 Patch0:		xorg7.1-6.6.3-tv_output.patch
 URL:		http://xorg.freedesktop.org/
@@ -29,8 +29,8 @@ BuildRequires:	xorg-proto-xf86driproto-devel
 BuildRequires:	xorg-proto-xf86miscproto-devel
 BuildRequires:	xorg-proto-xineramaproto-devel
 BuildRequires:	xorg-util-util-macros >= 0.99.2
-BuildRequires:	xorg-xserver-server-devel >= 1.0.99.901
-Requires:	xorg-xserver-server >= 1.0.99.901
+BuildRequires:	xorg-xserver-server-devel >= 1.2.99.903
+Requires:	xorg-xserver-server >= 1.2.99.903
 Obsoletes:	X11-driver-ati < 1:7.0.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
