@@ -5,12 +5,12 @@
 Summary:	X.org video drivers for ATI adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
-Version:	6.6.193
+Version:	6.7.191
 Release:	1%{?with_tv_output:.tv}
 License:	MIT
 Group:		X11/Applications
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	102b781f543213852401f3422b18ccc7
+# Source0-md5:	f350217d7b56890ba714f0479866210f
 # http://megahurts.dk/rune/stuff/xorg7.1-6.6.3-tv_output.patch.gz
 Patch0:		xorg7.1-6.6.3-tv_output.patch
 URL:		http://xorg.freedesktop.org/
@@ -19,6 +19,7 @@ BuildRequires:	autoconf >= 2.57
 BuildRequires:	automake
 BuildRequires:	libdrm-devel >= 2.0
 BuildRequires:	libtool
+BuildRequires:	pixman-devel
 BuildRequires:	pkgconfig >= 1:0.19
 BuildRequires:	xorg-proto-fontsproto-devel
 BuildRequires:	xorg-proto-randrproto-devel
@@ -106,6 +107,7 @@ Sterowniki obrazu X.org do kart graficznych ATI:
 %endif
 
 %build
+CPPFLAGS="$(pkg-config --cflags-only-I pixman-1) %{rpmcflags}"
 %{__libtoolize}
 %{__aclocal}
 %{__autoconf}
