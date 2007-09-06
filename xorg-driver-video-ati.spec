@@ -30,6 +30,8 @@ BuildRequires:	xorg-proto-xf86miscproto-devel
 BuildRequires:	xorg-proto-xineramaproto-devel
 BuildRequires:	xorg-util-util-macros >= 0.99.2
 BuildRequires:	xorg-xserver-server-devel >= 1.1.0
+BuildRequires:  rpmbuild(macros) >= 1.389
+%requires_xorg_xserver_videodrv
 Requires:	xorg-xserver-server >= 1.1.0
 Obsoletes:	X11-driver-ati < 1:7.0.0
 Obsoletes:	X11-driver-r128 < 1:7.0.0
