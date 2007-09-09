@@ -1,0 +1,829 @@
+diff --git a/man/radeon.man b/man/radeon.man
+index 88665bf..8217262 100644
+--- a/man/radeon.man
++++ b/man/radeon.man
+@@ -397,6 +397,20 @@ driver defaults for each chip.
+ The default is
+ .B off 
+ .TP
++.BI "Option \*qMacModel\*q \*q" string \*q
++.br
++Used to specify Mac models for connector tables and quirks.  Only valid
++ on PowerPC.
++.br
++ibook                \-\- ibooks
++.br
++powerbook-duallink   \-\- Powerbooks with dual link DVI
++.br
++powerbook            \-\- Powerbooks with single link DVI
++.br
++The default value is
++.B undefined.
++.TP
+ 
+ .SH SEE ALSO
+ __xservername__(__appmansuffix__), __xconfigfile__(__filemansuffix__), xorgconfig(__appmansuffix__), Xserver(__appmansuffix__), X(__miscmansuffix__)
+diff --git a/src/radeon.h b/src/radeon.h
+index 53fb5f7..4c99511 100644
+--- a/src/radeon.h
++++ b/src/radeon.h
+@@ -152,7 +152,11 @@ typedef enum {
+     OPTION_CONSTANTDPI,
+     OPTION_CONNECTORTABLE,
+     OPTION_DRI,
+-    OPTION_DEFAULT_CONNECTOR_TABLE
++    OPTION_DEFAULT_CONNECTOR_TABLE,
++#if defined(__powerpc__)
++    OPTION_MAC_MODEL,
++#endif
++    OPTION_DEFAULT_TMDS_PLL
+ } RADEONOpts;
+ 
+ 
+@@ -422,6 +426,14 @@ typedef enum {
+        CHIP_ERRATA_PLL_DELAY           = 0x00000004
+ } RADEONErrata;
+ 
++#if defined(__powerpc__)
++typedef enum {
++       RADEON_MAC_IBOOK             = 0x00000001,
++       RADEON_MAC_POWERBOOK_DL      = 0x00000002,
++       RADEON_MAC_POWERBOOK         = 0x00000004
++} RADEONMacModel;
++#endif
++
+ typedef enum {
+ 	CARD_PCI,
+ 	CARD_AGP,
+@@ -799,6 +811,11 @@ typedef struct {
+     Bool              crtc2_on;
+ 
+     Bool              InternalTVOut;
++    int               tvdac_use_count;
++
++#if defined(__powerpc__)
++    RADEONMacModel    MacModel;
++#endif
+ 
+     Rotation rotation;
+     void (*PointerMoved)(int, int, int);
+diff --git a/src/radeon_bios.c b/src/radeon_bios.c
+index 1ef0ff4..b24c481 100644
+--- a/src/radeon_bios.c
++++ b/src/radeon_bios.c
+@@ -879,23 +879,6 @@ Bool RADEONGetTMDSInfoFromBIOS (xf86OutputPtr output)
+ 		}
+ 		return TRUE;
+ 	    }
+-
+-	    /* revision 4 has some problem as it appears in RV280, 
+-	       comment it off for now, use default instead */ 
+-	    /*    
+-		  else if (RADEON_BIOS8(tmp) == 4) {
+-		  int stride = 0;
+-		  n = RADEON_BIOS8(tmp + 5) + 1;
+-		  if (n > 4) n = 4;
+-		  for (i=0; i<n; i++) {
+-		  radeon_output->tmds_pll[i].value = RADEON_BIOS32(tmp+stride+0x08);
+-		  radeon_output->tmds_pll[i].freq = RADEON_BIOS16(tmp+stride+0x10);
+-		  if (i == 0) stride += 10;
+-		  else stride += 6;
+-		  }
+-		  return TRUE;
+-		  }
+-	    */  
+ 	}
+     }
+     return FALSE;
+diff --git a/src/radeon_crtc.c b/src/radeon_crtc.c
+index e976e2c..47e46f3 100644
+--- a/src/radeon_crtc.c
++++ b/src/radeon_crtc.c
+@@ -680,7 +680,15 @@ RADEONInitPLLRegisters(ScrnInfoPtr pScrn, RADEONInfoPtr info,
+ 		   save->post_div);
+ 
+     save->ppll_ref_div   = pll->reference_div;
++
++#if defined(__powerpc__)
++    /* apparently programming this otherwise causes a hang??? */
++    if (info->MacModel == RADEON_MAC_IBOOK)
++	save->ppll_div_3 = 0x000600ad;
++    else
++#endif
+     save->ppll_div_3     = (save->feedback_div | (post_div->bitvalue << 16));
++
+     save->htotal_cntl    = 0;
+ 
+     save->vclk_ecp_cntl = (info->SavedReg.vclk_ecp_cntl &
+diff --git a/src/radeon_cursor.c b/src/radeon_cursor.c
+index f19f2bc..3e60d23 100644
+--- a/src/radeon_cursor.c
++++ b/src/radeon_cursor.c
+@@ -98,12 +98,22 @@ radeon_crtc_show_cursor (xf86CrtcPtr crtc)
+     RADEONInfoPtr      info       = RADEONPTR(pScrn);
+     unsigned char     *RADEONMMIO = info->MMIO;
+ 
++#ifdef XF86DRI
++    if (info->CPStarted && pScrn->pScreen) DRILock(pScrn->pScreen, 0);
++#endif
++
++    RADEON_SYNC(info, pScrn);
++
+     if (crtc_id == 0) 
+ 	OUTREGP(RADEON_CRTC_GEN_CNTL, RADEON_CRTC_CUR_EN | 2 << 20, 
+ 		~(RADEON_CRTC_CUR_EN | RADEON_CRTC_CUR_MODE_MASK));
+     else if (crtc_id == 1)
+ 	OUTREGP(RADEON_CRTC2_GEN_CNTL, RADEON_CRTC2_CUR_EN | 2 << 20,
+ 		~(RADEON_CRTC2_CUR_EN | RADEON_CRTC2_CUR_MODE_MASK));
++
++#ifdef XF86DRI
++    if (info->CPStarted && pScrn->pScreen) DRIUnlock(pScrn->pScreen);
++#endif
+ }
+ 
+ void
+@@ -115,12 +125,20 @@ radeon_crtc_hide_cursor (xf86CrtcPtr crtc)
+     RADEONInfoPtr      info       = RADEONPTR(pScrn);
+     unsigned char     *RADEONMMIO = info->MMIO;
+ 
++#ifdef XF86DRI
++    if (info->CPStarted && pScrn->pScreen) DRILock(pScrn->pScreen, 0);
++#endif
++
++    RADEON_SYNC(info, pScrn);
++
+     if (crtc_id == 0)
+ 	OUTREGP(RADEON_CRTC_GEN_CNTL, 0, ~RADEON_CRTC_CUR_EN);
+     else if (crtc_id == 1)
+ 	OUTREGP(RADEON_CRTC2_GEN_CNTL, 0, ~RADEON_CRTC2_CUR_EN);
+ 
+-
++#ifdef XF86DRI
++    if (info->CPStarted && pScrn->pScreen) DRIUnlock(pScrn->pScreen);
++#endif
+ }
+ 
+ void
+diff --git a/src/radeon_display.c b/src/radeon_display.c
+index ed45d79..fa80e10 100644
+--- a/src/radeon_display.c
++++ b/src/radeon_display.c
+@@ -373,6 +373,7 @@ void RADEONEnableDisplay(xf86OutputPtr output, BOOL bEnable)
+ 	    tmp |= RADEON_TV_ON;
+ 	    OUTREG(RADEON_TV_MASTER_CNTL, tmp);
+             tv_dac_change = 2;
++	    radeon_output->tv_on = TRUE;
+ 	}
+     } else {
+ 	ErrorF("disable montype: %d\n", radeon_output->MonType);
+@@ -431,6 +432,7 @@ void RADEONEnableDisplay(xf86OutputPtr output, BOOL bEnable)
+ 	    tmp &= ~RADEON_TV_ON;
+ 	    OUTREG(RADEON_TV_MASTER_CNTL, tmp);
+             tv_dac_change = 2;
++	    radeon_output->tv_on = FALSE;
+ 	}
+     }
+ 
+diff --git a/src/radeon_driver.c b/src/radeon_driver.c
+index 158e1e4..14d31bd 100644
+--- a/src/radeon_driver.c
++++ b/src/radeon_driver.c
+@@ -187,6 +187,10 @@ static const OptionInfoRec RADEONOptions[] = {
+     { OPTION_DRI,            "DRI",       	 OPTV_BOOLEAN, {0}, FALSE },
+     { OPTION_CONNECTORTABLE, "ConnectorTable",   OPTV_STRING,  {0}, FALSE },
+     { OPTION_DEFAULT_CONNECTOR_TABLE, "DefaultConnectorTable", OPTV_BOOLEAN, {0}, FALSE },
++    { OPTION_DEFAULT_TMDS_PLL, "DefaultTMDSPLL", OPTV_BOOLEAN, {0}, FALSE },
++#if defined(__powerpc__)
++    { OPTION_MAC_MODEL,      "MacModel",         OPTV_STRING,  {0}, FALSE },
++#endif
+     { -1,                    NULL,               OPTV_NONE,    {0}, FALSE }
+ };
+ 
+@@ -2688,30 +2692,28 @@ _X_EXPORT Bool RADEONPreInit(ScrnInfoPtr pScrn, int flags)
+ 	crtc_max_X = pScrn->display->virtualX;
+ 	crtc_max_Y = pScrn->display->virtualY;
+ 	if (info->allowColorTiling) {
+-	    if (crtc_max_X > info->MaxSurfaceWidth)
+-		crtc_max_X = info->MaxSurfaceWidth;
+-	    if (crtc_max_Y > info->MaxLines)
+-		crtc_max_Y = info->MaxLines;
+-	} else {
+-	    if (crtc_max_X > 8192)
+-		crtc_max_X = 8192;
+-	    if (crtc_max_Y > 8192)
+-		crtc_max_Y = 8192;
++	    if (crtc_max_X > info->MaxSurfaceWidth ||
++		crtc_max_Y > info->MaxLines) {
++		info->allowColorTiling = FALSE;
++		xf86DrvMsg(pScrn->scrnIndex, X_WARNING,
++			   "Requested desktop size exceeds surface limts for tiling, ColorTiling disabled\n");
++	    }
+ 	}
++	if (crtc_max_X > 8192)
++	    crtc_max_X = 8192;
++	if (crtc_max_Y > 8192)
++	    crtc_max_Y = 8192;
+     } else {
+-	if (pScrn->videoRam < 16384) {
++	if (pScrn->videoRam <= 16384) {
+ 	    crtc_max_X = 1600;
+ 	    crtc_max_Y = 1200;
+-	} else if (pScrn->videoRam <= 32768) {
+-	    crtc_max_X = 2048;
+-	    crtc_max_Y = 1200;
+-	} else if (pScrn->videoRam > 32768) {
++	} else {
+ 	    if (IS_R300_VARIANT) {
+ 		crtc_max_X = 2560;
+-		crtc_max_Y = 2048;
++		crtc_max_Y = 1200;
+ 	    } else {
+ 		crtc_max_X = 2048;
+-		crtc_max_Y = 2048;
++		crtc_max_Y = 1200;
+ 	    }
+ 	}
+     }
+@@ -2719,6 +2721,9 @@ _X_EXPORT Bool RADEONPreInit(ScrnInfoPtr pScrn, int flags)
+ 	       crtc_max_X, crtc_max_Y);
+     xf86DrvMsg(pScrn->scrnIndex, X_INFO,
+ 	       "For a larger or smaller max desktop size, add a Virtual line to your xorg.conf\n");
++    xf86DrvMsg(pScrn->scrnIndex, X_INFO,
++	       "If you are having trouble with 3D, "
++	       "reduce the desktop size by adjusting the Virtual line to your xorg.conf\n");
+ 
+     /*xf86CrtcSetSizeRange (pScrn, 320, 200, info->MaxSurfaceWidth, info->MaxLines);*/
+     xf86CrtcSetSizeRange (pScrn, 320, 200, crtc_max_X, crtc_max_Y);
+@@ -4566,6 +4571,12 @@ void RADEONRestorePLLRegisters(ScrnInfoPtr pScrn,
+     unsigned char *RADEONMMIO = info->MMIO;
+     CARD8 pllGain;
+ 
++#if defined(__powerpc__)
++    /* apparently restoring the pll causes a hang??? */
++    if (info->MacModel == RADEON_MAC_IBOOK)
++	return;
++#endif
++
+     pllGain = RADEONComputePLLGain(info->pll.reference_freq,
+ 				   restore->ppll_ref_div & RADEON_PPLL_REF_DIV_MASK,
+ 				   restore->ppll_div_3 & RADEON_PPLL_FB3_DIV_MASK);
+@@ -5219,6 +5230,7 @@ static void RADEONSavePLL2Registers(ScrnInfoPtr pScrn, RADEONSavePtr save)
+ 			      >> 16));
+ }
+ 
++#if 0
+ /* Read palette data */
+ static void RADEONSavePalette(ScrnInfoPtr pScrn, RADEONSavePtr save)
+ {
+@@ -5238,6 +5250,7 @@ static void RADEONSavePalette(ScrnInfoPtr pScrn, RADEONSavePtr save)
+     for (i = 0; i < 256; i++) save->palette[i] = INPAL_NEXT();
+     save->palette_valid = TRUE;
+ }
++#endif
+ 
+ /* Save state that defines current video mode */
+ static void RADEONSaveMode(ScrnInfoPtr pScrn, RADEONSavePtr save)
+diff --git a/src/radeon_modes.c b/src/radeon_modes.c
+index a5e1cc4..687e388 100644
+--- a/src/radeon_modes.c
++++ b/src/radeon_modes.c
+@@ -289,47 +289,47 @@ RADEONProbeOutputModes(xf86OutputPtr output)
+ #endif
+     ErrorF("in RADEONProbeOutputModes\n");
+ 
+-
+-    if (radeon_output->type == OUTPUT_DVI || radeon_output->type == OUTPUT_VGA) {
+-	edid_mon = xf86OutputGetEDID (output, radeon_output->pI2CBus);
+-	xf86OutputSetEDID (output, edid_mon);
++    if (output->status == XF86OutputStatusConnected) {
++	if (radeon_output->type == OUTPUT_DVI || radeon_output->type == OUTPUT_VGA) {
++	    edid_mon = xf86OutputGetEDID (output, radeon_output->pI2CBus);
++	    xf86OutputSetEDID (output, edid_mon);
+       
+-	modes = xf86OutputGetEDIDModes (output);
+-	return modes;
+-    }
+-    if (radeon_output->type == OUTPUT_STV || radeon_output->type == OUTPUT_CTV) {
+-	modes = RADEONTVModes(output);
+-	return modes;
+-    }
+-    if (radeon_output->type == OUTPUT_LVDS) {
+-	/* okay we got DDC info */
+-	if (output->MonInfo) {
+-	    /* Debug info for now, at least */
+-	    xf86DrvMsg(pScrn->scrnIndex, X_INFO, "EDID for output %d\n", radeon_output->num);
+-	    xf86PrintEDID(output->MonInfo);
++	    modes = xf86OutputGetEDIDModes (output);
++	    return modes;
++	}
++	if (radeon_output->type == OUTPUT_STV || radeon_output->type == OUTPUT_CTV) {
++	    modes = RADEONTVModes(output);
++	    return modes;
++	}
++	if (radeon_output->type == OUTPUT_LVDS) {
++	    /* okay we got DDC info */
++	    if (output->MonInfo) {
++		/* Debug info for now, at least */
++		xf86DrvMsg(pScrn->scrnIndex, X_INFO, "EDID for output %d\n", radeon_output->num);
++		xf86PrintEDID(output->MonInfo);
+ 	
+-	    modes = xf86DDCGetModes(pScrn->scrnIndex, output->MonInfo);
++		modes = xf86DDCGetModes(pScrn->scrnIndex, output->MonInfo);
+ 	
+-	    for (mode = modes; mode != NULL; mode = mode->next) {
+-		if (mode->Flags & V_DBLSCAN) {
+-		    if ((mode->CrtcHDisplay >= 1024) || (mode->CrtcVDisplay >= 768))
+-			mode->status = MODE_CLOCK_RANGE;
++		for (mode = modes; mode != NULL; mode = mode->next) {
++		    if (mode->Flags & V_DBLSCAN) {
++			if ((mode->CrtcHDisplay >= 1024) || (mode->CrtcVDisplay >= 768))
++			    mode->status = MODE_CLOCK_RANGE;
++		    }
+ 		}
+-	    }
+-	    xf86PruneInvalidModes(pScrn, &modes, TRUE);
++		xf86PruneInvalidModes(pScrn, &modes, TRUE);
+ 	
+-	    /* do some physcial size stuff */
+-	}
++		/* do some physcial size stuff */
++	    }
+       
+-	if (modes == NULL) {
+-	    RADEONValidateFPModes(output, pScrn->display->modes, &modes);
++	    if (modes == NULL) {
++		RADEONValidateFPModes(output, pScrn->display->modes, &modes);
++	    }
+ 	}
+     }
+     
+     if (modes) {
+ 	xf86ValidateModesUserConfig(pScrn, modes);
+-	xf86PruneInvalidModes(pScrn, &modes,
+-			      FALSE);
++	xf86PruneInvalidModes(pScrn, &modes, FALSE);
+     }
+ 
+     return modes;
+diff --git a/src/radeon_output.c b/src/radeon_output.c
+index c2b749a..40d8873 100644
+--- a/src/radeon_output.c
++++ b/src/radeon_output.c
+@@ -152,6 +152,7 @@ static RADEONMonitorType radeon_detect_tv(ScrnInfoPtr pScrn);
+ static RADEONMonitorType radeon_detect_primary_dac(ScrnInfoPtr pScrn, Bool color);
+ static RADEONMonitorType radeon_detect_tv_dac(ScrnInfoPtr pScrn, Bool color);
+ static RADEONMonitorType radeon_detect_ext_dac(ScrnInfoPtr pScrn);
++static void RADEONGetTMDSInfoFromTable(xf86OutputPtr output);
+ 
+ void RADEONPrintPortMap(ScrnInfoPtr pScrn)
+ {
+@@ -535,21 +536,29 @@ void RADEONConnectorFindMonitor(ScrnInfoPtr pScrn, xf86OutputPtr output)
+ 
+     if (radeon_output->MonType == MT_UNKNOWN) {
+ 	if (radeon_output->type == OUTPUT_STV || radeon_output->type == OUTPUT_CTV) {
+-	    if (info->InternalTVOut)
+-		radeon_output->MonType = radeon_detect_tv(pScrn);
++	    if (info->InternalTVOut) {
++		if (radeon_output->load_detection)
++		    radeon_output->MonType = radeon_detect_tv(pScrn);
++		else
++		    radeon_output->MonType = MT_NONE;
++	    }
+ 	} else {
+ 	    radeon_output->MonType = RADEONDisplayDDCConnected(pScrn, output);
+ 	    if (!radeon_output->MonType) {
+ 		if (radeon_output->type == OUTPUT_LVDS || radeon_output->type == OUTPUT_DVI)
+ 		    radeon_output->MonType = RADEONPortCheckNonDDC(pScrn, output);
+ 		if (!radeon_output->MonType) {
+-		    if (radeon_output->DACType == DAC_PRIMARY)
+-			radeon_output->MonType = radeon_detect_primary_dac(pScrn, TRUE);
+-		    else if (radeon_output->DACType == DAC_TVDAC) {
+-			if (info->ChipFamily == CHIP_FAMILY_R200)
+-			    radeon_output->MonType = radeon_detect_ext_dac(pScrn);
+-			else
+-			    radeon_output->MonType = radeon_detect_tv_dac(pScrn, TRUE);
++		    if (radeon_output->DACType == DAC_PRIMARY) {
++			if (radeon_output->load_detection)
++			    radeon_output->MonType = radeon_detect_primary_dac(pScrn, TRUE);
++		    } else if (radeon_output->DACType == DAC_TVDAC) {
++			if (radeon_output->load_detection) {
++			    if (info->ChipFamily == CHIP_FAMILY_R200)
++				radeon_output->MonType = radeon_detect_ext_dac(pScrn);
++			    else
++				radeon_output->MonType = radeon_detect_tv_dac(pScrn, TRUE);
++			} else
++			    radeon_output->MonType = MT_NONE;
+ 		    }
+ 		}
+ 	    }
+@@ -1564,8 +1573,10 @@ radeon_set_backlight_level(xf86OutputPtr output, int level)
+ }
+ 
+ static Atom backlight_atom;
++static Atom tmds_pll_atom;
+ static Atom rmx_atom;
+ static Atom monitor_type_atom;
++static Atom load_detection_atom;
+ static Atom tv_hsize_atom;
+ static Atom tv_hpos_atom;
+ static Atom tv_vpos_atom;
+@@ -1606,6 +1617,66 @@ radeon_create_resources(xf86OutputPtr output)
+ 	}
+     }
+ 
++    if (radeon_output->DACType == DAC_PRIMARY ||
++	radeon_output->DACType == DAC_TVDAC) {
++	load_detection_atom = MAKE_ATOM("load_detection");
++
++	range[0] = 0; /* off */
++	range[1] = 1; /* on */
++	err = RRConfigureOutputProperty(output->randr_output, load_detection_atom,
++					FALSE, TRUE, FALSE, 2, range);
++	if (err != 0) {
++	    xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
++		       "RRConfigureOutputProperty error, %d\n", err);
++	}	
++
++	if (radeon_output->DACType == DAC_PRIMARY)
++	    data = 1; /* primary dac, only drives vga */
++	else if (radeon_output->DACType == DAC_TVDAC &&
++		 info->tvdac_use_count < 2)
++	    data = 1; /* only one output with tvdac */
++	else
++	    data = 0; /* shared tvdac between vga/dvi/tv */
++
++	err = RRChangeOutputProperty(output->randr_output, load_detection_atom,
++				     XA_INTEGER, 32, PropModeReplace, 1, &data,
++				     FALSE, TRUE);
++	if (err != 0) {
++	    xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
++		       "RRChangeOutputProperty error, %d\n", err);
++	}
++    }
++
++    if (radeon_output->type == OUTPUT_DVI &&
++	radeon_output->TMDSType == TMDS_INT) {
++	tmds_pll_atom = MAKE_ATOM("tmds_pll");
++
++	err = RRConfigureOutputProperty(output->randr_output, tmds_pll_atom,
++					FALSE, FALSE, FALSE, 0, NULL);
++	if (err != 0) {
++	    xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
++		       "RRConfigureOutputProperty error, %d\n", err);
++	}
++	/* Set the current value of the property */
++#if defined(__powerpc__)
++	s = "driver";
++#else
++	s = "bios";
++#endif
++	if (xf86ReturnOptValBool(info->Options, OPTION_DEFAULT_TMDS_PLL, FALSE)) {
++	    s = "driver";
++	}
++
++	err = RRChangeOutputProperty(output->randr_output, tmds_pll_atom,
++				     XA_STRING, 8, PropModeReplace, strlen(s), (pointer)s,
++				     FALSE, FALSE);
++	if (err != 0) {
++	    xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
++		       "RRChangeOutputProperty error, %d\n", err);
++	}
++
++    }
++
+     /* RMX control - fullscreen, centered, keep ratio */
+     /* actually more of a crtc property as only crtc1 has rmx */
+     if (radeon_output->type == OUTPUT_LVDS ||
+@@ -1619,7 +1690,7 @@ radeon_create_resources(xf86OutputPtr output)
+ 		       "RRConfigureOutputProperty error, %d\n", err);
+ 	}
+ 	/* Set the current value of the property */
+-	s = "fill";
++	s = "full";
+ 	err = RRChangeOutputProperty(output->randr_output, rmx_atom,
+ 				     XA_STRING, 8, PropModeReplace, strlen(s), (pointer)s,
+ 				     FALSE, FALSE);
+@@ -1730,7 +1801,27 @@ radeon_create_resources(xf86OutputPtr output)
+ 		       "RRConfigureOutputProperty error, %d\n", err);
+ 	}
+ 	/* Set the current value of the backlight property */
+-	s = "default";
++	switch (radeon_output->default_tvStd) {
++	case TV_STD_PAL:
++	    s = "pal";
++	    break;
++	case TV_STD_PAL_M:
++	    s = "pal-m";
++	    break;
++	case TV_STD_PAL_60:
++	    s = "pal-60";
++	    break;
++	case TV_STD_NTSC_J:
++	    s = "ntsc-j";
++	    break;
++	case TV_STD_SCART_PAL:
++	    s = "scart-pal";
++	    break;
++	case TV_STD_NTSC:
++	default:
++	    s = "ntsc";
++	    break;
++	}
+ 	err = RRChangeOutputProperty(output->randr_output, tv_std_atom,
+ 				     XA_STRING, 8, PropModeReplace, strlen(s), (pointer)s,
+ 				     FALSE, FALSE);
+@@ -1766,6 +1857,19 @@ radeon_set_property(xf86OutputPtr output, Atom property,
+ 
+ 	radeon_set_backlight_level(output, val);
+ 
++    } else if (property == load_detection_atom) {
++	if (value->type != XA_INTEGER ||
++	    value->format != 32 ||
++	    value->size != 1) {
++	    return FALSE;
++	}
++
++	val = *(INT32 *)value->data;
++	if (val < 0 || val > 1)
++	    return FALSE;
++
++	radeon_output->load_detection = val;
++
+     } else if (property == rmx_atom) {
+ 	xf86CrtcPtr	crtc = output->crtc;
+ 	RADEONCrtcPrivatePtr radeon_crtc = crtc->driver_private;
+@@ -1785,6 +1889,20 @@ radeon_set_property(xf86OutputPtr output, Atom property,
+ 	} else {
+ 	    return FALSE;
+ 	}
++    } else if (property == tmds_pll_atom) {
++	const char *s;
++	if (value->type != XA_STRING || value->format != 8)
++	    return FALSE;
++	s = (char*)value->data;
++	if (value->size == strlen("bios") && !strncmp("bios", s, strlen("bios"))) {
++	    if (!RADEONGetTMDSInfoFromBIOS(output))
++		RADEONGetTMDSInfoFromTable(output);
++	    return TRUE;
++	} else if (value->size == strlen("driver") && !strncmp("driver", s, strlen("driver"))) {
++	    RADEONGetTMDSInfoFromTable(output);
++	    return TRUE;
++	}
++	return FALSE;
+     } else if (property == monitor_type_atom) {
+ 	const char *s;
+ 	if (value->type != XA_STRING || value->format != 8)
+@@ -1813,7 +1931,8 @@ radeon_set_property(xf86OutputPtr output, Atom property,
+ 	    return FALSE;
+ 
+ 	radeon_output->hSize = val;
+-	/*RADEONUpdateHVPosition(output, NULL);*/
++	if (radeon_output->tv_on)
++	    RADEONUpdateHVPosition(output, &output->crtc->mode);
+ 	return TRUE;
+     } else if (property == tv_hpos_atom) {
+ 	if (value->type != XA_INTEGER ||
+@@ -1827,7 +1946,8 @@ radeon_set_property(xf86OutputPtr output, Atom property,
+ 	    return FALSE;
+ 
+ 	radeon_output->hPos = val;
+-	/*RADEONUpdateHVPosition(output, NULL);*/
++	if (radeon_output->tv_on)
++	    RADEONUpdateHVPosition(output, &output->crtc->mode);
+ 	return TRUE;
+     } else if (property == tv_vpos_atom) {
+ 	if (value->type != XA_INTEGER ||
+@@ -1841,17 +1961,15 @@ radeon_set_property(xf86OutputPtr output, Atom property,
+ 	    return FALSE;
+ 
+ 	radeon_output->vPos = val;
+-	/*RADEONUpdateHVPosition(output, NULL);*/
++	if (radeon_output->tv_on)
++	    RADEONUpdateHVPosition(output, &output->crtc->mode);
+ 	return TRUE;
+     } else if (property == tv_std_atom) {
+ 	const char *s;
+ 	if (value->type != XA_STRING || value->format != 8)
+ 	    return FALSE;
+ 	s = (char*)value->data;
+-	if (value->size == strlen("default") && !strncmp("default", s, strlen("default"))) {
+-	    radeon_output->tvStd = radeon_output->default_tvStd;
+-	    return TRUE;
+-	} else if (value->size == strlen("ntsc") && !strncmp("ntsc", s, strlen("ntsc"))) {
++	if (value->size == strlen("ntsc") && !strncmp("ntsc", s, strlen("ntsc"))) {
+ 	    if (radeon_output->SupportedTVStds & TV_STD_NTSC) {
+ 		radeon_output->tvStd = TV_STD_NTSC;
+ 		return TRUE;
+@@ -2256,7 +2374,7 @@ RADEONGetLVDSInfo (xf86OutputPtr output)
+ }
+ 
+ static void
+-RADEONGetTMDSInfo(xf86OutputPtr output)
++RADEONGetTMDSInfoFromTable(xf86OutputPtr output)
+ {
+     ScrnInfoPtr pScrn = output->scrn;
+     RADEONInfoPtr  info       = RADEONPTR(pScrn);
+@@ -2264,16 +2382,26 @@ RADEONGetTMDSInfo(xf86OutputPtr output)
+     int i;
+ 
+     for (i=0; i<4; i++) {
++        radeon_output->tmds_pll[i].value = default_tmds_pll[info->ChipFamily][i].value;
++        radeon_output->tmds_pll[i].freq = default_tmds_pll[info->ChipFamily][i].freq;
++    }
++}
++
++static void
++RADEONGetTMDSInfo(xf86OutputPtr output)
++{
++    RADEONOutputPrivatePtr radeon_output = output->driver_private;
++    int i;
++
++    for (i=0; i<4; i++) {
+         radeon_output->tmds_pll[i].value = 0;
+         radeon_output->tmds_pll[i].freq = 0;
+     }
+ 
+     if (RADEONGetTMDSInfoFromBIOS(output)) return;
+ 
+-    for (i=0; i<4; i++) {
+-        radeon_output->tmds_pll[i].value = default_tmds_pll[info->ChipFamily][i].value;
+-        radeon_output->tmds_pll[i].freq = default_tmds_pll[info->ChipFamily][i].freq;
+-    }
++    RADEONGetTMDSInfoFromTable(output);
++
+ }
+ 
+ static void
+@@ -2298,6 +2426,7 @@ RADEONGetTVInfo(xf86OutputPtr output)
+ void RADEONInitConnector(xf86OutputPtr output)
+ {
+     ScrnInfoPtr	    pScrn = output->scrn;
++    RADEONInfoPtr  info       = RADEONPTR(pScrn);
+     RADEONOutputPrivatePtr radeon_output = output->driver_private;
+     int DDCReg = 0;
+     char* name = (char*) DDCTypeName[radeon_output->DDCType];
+@@ -2310,7 +2439,15 @@ void RADEONInitConnector(xf86OutputPtr output)
+     case DDC_LCD  : DDCReg = RADEON_LCD_GPIO_MASK; break;
+     default: break;
+     }
+-    
++
++    if (radeon_output->DACType == DAC_PRIMARY)
++	radeon_output->load_detection = 1; /* primary dac, only drives vga */
++    else if (radeon_output->DACType == DAC_TVDAC &&
++	     info->tvdac_use_count < 2)
++	radeon_output->load_detection = 1; /* only one output with tvdac */
++    else
++	radeon_output->load_detection = 0; /* shared tvdac between vga/dvi/tv */
++
+     if (DDCReg) {
+ 	radeon_output->DDCReg = DDCReg;
+ 	RADEONI2CInit(pScrn, &radeon_output->pI2CBus, DDCReg, name);
+@@ -2330,11 +2467,84 @@ void RADEONInitConnector(xf86OutputPtr output)
+     }
+ 
+     if (radeon_output->DACType == DAC_TVDAC) {
++	radeon_output->tv_on = FALSE;
+ 	RADEONGetTVDacAdjInfo(output);
+     }
+ 
+ }
+ 
++#if defined(__powerpc__)
++static Bool RADEONSetupAppleConnectors(ScrnInfoPtr pScrn)
++{
++    RADEONInfoPtr info       = RADEONPTR(pScrn);
++
++
++    switch (info->MacModel) {
++    case RADEON_MAC_IBOOK:
++	info->BiosConnector[0].DDCType = DDC_DVI;
++	info->BiosConnector[0].DACType = DAC_NONE;
++	info->BiosConnector[0].TMDSType = TMDS_NONE;
++	info->BiosConnector[0].ConnectorType = CONNECTOR_PROPRIETARY;
++	info->BiosConnector[0].valid = TRUE;
++
++	info->BiosConnector[1].DDCType = DDC_VGA;
++	info->BiosConnector[1].DACType = DAC_TVDAC;
++	info->BiosConnector[1].TMDSType = TMDS_NONE;
++	info->BiosConnector[1].ConnectorType = CONNECTOR_CRT;
++	info->BiosConnector[1].valid = TRUE;
++
++	info->BiosConnector[2].ConnectorType = CONNECTOR_STV;
++	info->BiosConnector[2].DACType = DAC_TVDAC;
++	info->BiosConnector[2].TMDSType = TMDS_NONE;
++	info->BiosConnector[2].DDCType = DDC_NONE_DETECTED;
++	info->BiosConnector[2].valid = TRUE;
++	return TRUE;
++    case RADEON_MAC_POWERBOOK_DL:
++	info->BiosConnector[0].DDCType = DDC_DVI;
++	info->BiosConnector[0].DACType = DAC_NONE;
++	info->BiosConnector[0].TMDSType = TMDS_NONE;
++	info->BiosConnector[0].ConnectorType = CONNECTOR_PROPRIETARY;
++	info->BiosConnector[0].valid = TRUE;
++
++	info->BiosConnector[1].DDCType = DDC_VGA;
++	info->BiosConnector[1].DACType = DAC_PRIMARY;
++	info->BiosConnector[1].TMDSType = TMDS_EXT;
++	info->BiosConnector[1].ConnectorType = CONNECTOR_DVI_I;
++	info->BiosConnector[1].valid = TRUE;
++
++	info->BiosConnector[2].ConnectorType = CONNECTOR_STV;
++	info->BiosConnector[2].DACType = DAC_TVDAC;
++	info->BiosConnector[2].TMDSType = TMDS_NONE;
++	info->BiosConnector[2].DDCType = DDC_NONE_DETECTED;
++	info->BiosConnector[2].valid = TRUE;
++	return TRUE;
++    case RADEON_MAC_POWERBOOK:
++	info->BiosConnector[0].DDCType = DDC_DVI;
++	info->BiosConnector[0].DACType = DAC_NONE;
++	info->BiosConnector[0].TMDSType = TMDS_NONE;
++	info->BiosConnector[0].ConnectorType = CONNECTOR_PROPRIETARY;
++	info->BiosConnector[0].valid = TRUE;
++
++	info->BiosConnector[1].DDCType = DDC_VGA;
++	info->BiosConnector[1].DACType = DAC_PRIMARY;
++	info->BiosConnector[1].TMDSType = TMDS_INT;
++	info->BiosConnector[1].ConnectorType = CONNECTOR_DVI_I;
++	info->BiosConnector[1].valid = TRUE;
++
++	info->BiosConnector[2].ConnectorType = CONNECTOR_STV;
++	info->BiosConnector[2].DACType = DAC_TVDAC;
++	info->BiosConnector[2].TMDSType = TMDS_NONE;
++	info->BiosConnector[2].DDCType = DDC_NONE_DETECTED;
++	info->BiosConnector[2].valid = TRUE;
++	return TRUE;
++    default:
++	return FALSE;
++    }
++
++    return FALSE;
++}
++#endif
++
+ static void RADEONSetupGenericConnectors(ScrnInfoPtr pScrn)
+ {
+     RADEONInfoPtr info       = RADEONPTR(pScrn);
+@@ -2370,7 +2580,7 @@ static void RADEONSetupGenericConnectors(ScrnInfoPtr pScrn)
+ 
+ 	    info->BiosConnector[1].DDCType = DDC_VGA;
+ 	    info->BiosConnector[1].DACType = DAC_PRIMARY;
+-	    info->BiosConnector[1].TMDSType = TMDS_EXT;
++	    info->BiosConnector[1].TMDSType = TMDS_UNKNOWN;
+ 	    info->BiosConnector[1].ConnectorType = CONNECTOR_CRT;
+ 	    info->BiosConnector[1].valid = TRUE;
+ 	}
+@@ -2451,6 +2661,27 @@ Bool RADEONSetupConnectors(ScrnInfoPtr pScrn)
+ 	info->BiosConnector[i].ConnectorType = CONNECTOR_NONE;
+     }
+ 
++#if defined(__powerpc__)
++    optstr = (char *)xf86GetOptValString(info->Options, OPTION_MAC_MODEL);
++
++    info->MacModel = 0;
++    if (optstr) {
++	if (!strncmp("ibook", optstr, strlen("ibook")))
++	    info->MacModel = RADEON_MAC_IBOOK;
++	else if (!strncmp("powerbook-duallink", optstr, strlen("powerbook-duallink")))
++	    info->MacModel = RADEON_MAC_POWERBOOK_DL;
++	else if (!strncmp("powerbook", optstr, strlen("powerbook")))
++	    info->MacModel = RADEON_MAC_POWERBOOK;
++	else {
++	    xf86DrvMsg(pScrn->scrnIndex, X_ERROR, "Invalid Mac Model: %s\n", optstr);
++	    return FALSE;
++	}
++
++	if (!RADEONSetupAppleConnectors(pScrn))
++	    RADEONSetupGenericConnectors(pScrn);
++
++    } else
++#endif
+     if (xf86ReturnOptValBool(info->Options, OPTION_DEFAULT_CONNECTOR_TABLE, FALSE)) {
+ 	RADEONSetupGenericConnectors(pScrn);
+     } else {
+@@ -2494,8 +2725,12 @@ Bool RADEONSetupConnectors(ScrnInfoPtr pScrn)
+ 	}
+     }
+ 
++    info->tvdac_use_count = 0;
+     for (i = 0; i < RADEON_MAX_BIOS_CONNECTOR; i++) {
+ 	if (info->BiosConnector[i].valid) {
++	    if (info->BiosConnector[i].DACType == DAC_TVDAC)
++		info->tvdac_use_count++;
++
+ 	    if (info->IsAtomBios) {
+ 		if ((info->BiosConnector[i].ConnectorType == CONNECTOR_DVI_D_ATOM) ||
+ 		    (info->BiosConnector[i].ConnectorType == CONNECTOR_DVI_I_ATOM) ||
+diff --git a/src/radeon_probe.h b/src/radeon_probe.h
+index d79e7ad..bc6f0b9 100644
+--- a/src/radeon_probe.h
++++ b/src/radeon_probe.h
+@@ -204,6 +204,8 @@ typedef struct _RADEONOutputPrivateRec {
+     int               hSize;
+     float             TVRefClk;
+     int               SupportedTVStds;
++    Bool              tv_on;
++    int               load_detection;
+ } RADEONOutputPrivateRec, *RADEONOutputPrivatePtr;
+ 
+ #define RADEON_MAX_CRTC 2
