@@ -6,13 +6,14 @@ Summary:	X.org video drivers for ATI adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
 Version:	6.6.193
-Release:	1%{?with_tv_output:.tv}
+Release:	2%{?with_tv_output:.tv}
 License:	MIT
 Group:		X11/Applications
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
 # Source0-md5:	102b781f543213852401f3422b18ccc7
 # http://megahurts.dk/rune/stuff/xorg7.1-6.6.3-tv_output.patch.gz
 Patch0:		xorg7.1-6.6.3-tv_output.patch
+Patch1:		%{name}-radeon-ddc6.patch
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.57
@@ -104,6 +105,7 @@ Sterowniki obrazu X.org do kart graficznych ATI:
 %if %{with tv_output}
 %patch0 -p1
 %endif
+%patch1 -p1
 
 %build
 %{__libtoolize}

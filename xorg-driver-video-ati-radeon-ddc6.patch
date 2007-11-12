@@ -1,27 +1,25 @@
-diff --git a/src/radeon_bios.c b/src/radeon_bios.c
-index 65c2bb0..ff0f915 100644
---- a/src/radeon_bios.c
-+++ b/src/radeon_bios.c
-@@ -277,7 +277,7 @@ static Bool RADEONGetLegacyConnectorInfoFromBIOS (ScrnInfoPtr pScrn)
- 		    tmp1 = RADEON_BIOS8(tmp0+2) & 0x07;
- 		    if (tmp1) {	    
- 			info->BiosConnector[4].DDCType	= tmp1;      
--			if (info->BiosConnector[4].DDCType > DDC_LCD) {
-+			if (info->BiosConnector[4].DDCType > DDC_GPIO) {
+diff -urN xf86-video-ati-6.6.193.org/src/radeon_bios.c xf86-video-ati-6.6.193/src/radeon_bios.c
+--- xf86-video-ati-6.6.193.org/src/radeon_bios.c	2007-08-04 09:21:28.000000000 +0200
++++ xf86-video-ati-6.6.193/src/radeon_bios.c	2007-11-12 10:27:31.860278536 +0100
+@@ -309,7 +309,7 @@
+ 	        if ((tmp0 = RADEON_BIOS16(tmp + 0x15))) {
+ 		    if ((tmp1 = RADEON_BIOS8(tmp0+2) & 0x07)) {	    
+ 			pRADEONEnt->PortInfo[0]->DDCType	= tmp1;      
+-			if (pRADEONEnt->PortInfo[0]->DDCType > DDC_LCD) {
++			if (pRADEONEnt->PortInfo[0]->DDCType > DDC_GPIO) {
  			    xf86DrvMsg(pScrn->scrnIndex, X_WARNING,
  				       "Unknown DDCType %d found\n",
- 				       info->BiosConnector[4].DDCType);
-diff --git a/src/radeon_output.c b/src/radeon_output.c
-index a6da78e..8f9135d 100644
---- a/src/radeon_output.c
-+++ b/src/radeon_output.c
-@@ -75,13 +75,14 @@ const char *TMDSTypeName[4] = {
-   "None"
+ 				       pRADEONEnt->PortInfo[0]->DDCType);
+diff -urN xf86-video-ati-6.6.193.org/src/radeon_display.c xf86-video-ati-6.6.193/src/radeon_display.c
+--- xf86-video-ati-6.6.193.org/src/radeon_display.c	2007-08-04 09:50:23.000000000 +0200
++++ xf86-video-ati-6.6.193/src/radeon_display.c	2007-11-12 10:33:57.056504105 +0100
+@@ -75,13 +75,14 @@
+   "External"
  };
  
 -const char *DDCTypeName[6] = {
 +const char *DDCTypeName[7] = {
-   "None",
+   "NONE",
    "MONID",
    "DVI_DDC",
    "VGA_DDC",
@@ -31,61 +29,61 @@ index a6da78e..8f9135d 100644
 +  "GPIO_DDC"
  };
  
- const char *DACTypeName[4] = {
-@@ -277,7 +278,7 @@ RADEONDisplayDDCConnected(ScrnInfoPtr pScrn, xf86OutputPtr output)
-     DDCReg = radeon_output->DDCReg;
+ const char *DACTypeName[3] = {
+@@ -172,6 +173,10 @@
+         val = INREG(info->DDCReg+4);
+         *Clock = (val & (1<<13)) != 0;
+         *data  = (val & (1<<12)) != 0;
++    } else if (info->DDCReg == RADEON_MDGPIO_EN_REG) {
++	val = INREG(info->DDCReg+4);
++	*Clock = (val & (1<<19)) != 0;
++	*data  = (val & (1<<18)) != 0;
+     } else {
+         val = INREG(info->DDCReg);
+         *Clock = (val & RADEON_GPIO_Y_1) != 0;
+@@ -191,6 +196,11 @@
+         val |= (Clock ? 0:(1<<13));
+         val |= (data ? 0:(1<<12));
+         OUTREG(info->DDCReg, val);
++    } else if (info->DDCReg == RADEON_MDGPIO_EN_REG) {
++	val = INREG(info->DDCReg) & (CARD32)~((1<<18) | (1<<19));
++	val |= (Clock ? 0:(1<<19));
++	val |= (data ? 0:(1<<18));
++	OUTREG(info->DDCReg, val);
+     } else {
+         val = INREG(info->DDCReg) & (CARD32)~(RADEON_GPIO_EN_0 | RADEON_GPIO_EN_1);
+         val |= (Clock ? 0:RADEON_GPIO_EN_1);
+@@ -578,13 +588,16 @@
+     case DDC_LCD:
+ 	info->DDCReg = RADEON_LCD_GPIO_MASK;
+ 	break;
++    case DDC_GPIO:
++	info->DDCReg = RADEON_MDGPIO_EN_REG;
++	break;
+     default:
+ 	info->DDCReg = DDCReg;
+ 	return MT_NONE;
+     }
  
      /* Read and output monitor info using DDC2 over I2C bus */
--    if (radeon_output->pI2CBus && info->ddc2 && (DDCReg != RADEON_LCD_GPIO_MASK)) {
-+    if (radeon_output->pI2CBus && info->ddc2 && (DDCReg != RADEON_LCD_GPIO_MASK) && (DDCReg != RADEON_MDGPIO_EN_REG)) {
- 	OUTREG(DDCReg, INREG(DDCReg) &
+-    if (info->pI2CBus && info->ddc2 && (info->DDCReg != RADEON_LCD_GPIO_MASK)) {
++    if (info->pI2CBus && info->ddc2 && (info->DDCReg != RADEON_LCD_GPIO_MASK) && (info->DDCReg != RADEON_MDGPIO_EN_REG)) {
+ 	OUTREG(info->DDCReg, INREG(info->DDCReg) &
  	       (CARD32)~(RADEON_GPIO_A_0 | RADEON_GPIO_A_1));
  
-@@ -331,7 +332,7 @@ RADEONDisplayDDCConnected(ScrnInfoPtr pScrn, xf86OutputPtr output)
+@@ -638,7 +651,7 @@
  	    usleep(15000);
  	    if(*MonInfo)  break;
  	}
--    } else if (radeon_output->pI2CBus && info->ddc2 && DDCReg == RADEON_LCD_GPIO_MASK) {
-+    } else if (radeon_output->pI2CBus && info->ddc2 && ((DDCReg == RADEON_LCD_GPIO_MASK) || (DDCReg == RADEON_MDGPIO_EN_REG))) {
-          *MonInfo = xf86DoEDID_DDC2(pScrn->scrnIndex, radeon_output->pI2CBus);
+-    } else if (info->pI2CBus && info->ddc2 && info->DDCReg == RADEON_LCD_GPIO_MASK) {
++    } else if (info->pI2CBus && info->ddc2 && ((info->DDCReg == RADEON_LCD_GPIO_MASK) || (info->DDCReg == RADEON_MDGPIO_EN_REG))) {
+          *MonInfo = xf86DoEDID_DDC2(pScrn->scrnIndex, info->pI2CBus);
      } else {
  	xf86DrvMsg(pScrn->scrnIndex, X_WARNING, "DDC2/I2C is not properly initialized\n");
-@@ -2206,6 +2207,10 @@ static void RADEONI2CGetBits(I2CBusPtr b, int *Clock, int *data)
-         val = INREG(b->DriverPrivate.uval+4);
-         *Clock = (val & (1<<13)) != 0;
-         *data  = (val & (1<<12)) != 0;
-+    } else if (b->DriverPrivate.uval == RADEON_MDGPIO_EN_REG) {
-+        val = INREG(b->DriverPrivate.uval+4);
-+        *Clock = (val & (1<<19)) != 0;
-+        *data  = (val & (1<<18)) != 0;
-     } else {
-         val = INREG(b->DriverPrivate.uval);
-         *Clock = (val & RADEON_GPIO_Y_1) != 0;
-@@ -2225,6 +2230,11 @@ static void RADEONI2CPutBits(I2CBusPtr b, int Clock, int data)
-         val |= (Clock ? 0:(1<<13));
-         val |= (data ? 0:(1<<12));
-         OUTREG(b->DriverPrivate.uval, val);
-+    } else if (b->DriverPrivate.uval == RADEON_MDGPIO_EN_REG) {
-+        val = INREG(b->DriverPrivate.uval) & (CARD32)~((1<<18) | (1<<19));
-+        val |= (Clock ? 0:(1<<19));
-+        val |= (data ? 0:(1<<18));
-+        OUTREG(b->DriverPrivate.uval, val);
-     } else {
-         val = INREG(b->DriverPrivate.uval) & (CARD32)~(RADEON_GPIO_EN_0 | RADEON_GPIO_EN_1);
-         val |= (Clock ? 0:RADEON_GPIO_EN_1);
-@@ -2547,6 +2557,7 @@ void RADEONInitConnector(xf86OutputPtr output)
-     case DDC_VGA  : DDCReg = RADEON_GPIO_VGA_DDC; break;
-     case DDC_CRT2 : DDCReg = RADEON_GPIO_CRT2_DDC; break;
-     case DDC_LCD  : DDCReg = RADEON_LCD_GPIO_MASK; break;
-+    case DDC_GPIO : DDCReg = RADEON_MDGPIO_EN_REG; break;
-     default: break;
-     }
- 
-diff --git a/src/radeon_probe.h b/src/radeon_probe.h
-index dbd50d7..66ece94 100644
---- a/src/radeon_probe.h
-+++ b/src/radeon_probe.h
-@@ -60,6 +60,7 @@ typedef enum
+diff -urN xf86-video-ati-6.6.193.org/src/radeon_probe.h xf86-video-ati-6.6.193/src/radeon_probe.h
+--- xf86-video-ati-6.6.193.org/src/radeon_probe.h	2007-08-04 09:27:06.000000000 +0200
++++ xf86-video-ati-6.6.193/src/radeon_probe.h	2007-11-12 10:34:12.810637385 +0100
+@@ -50,6 +50,7 @@
      DDC_VGA,
      DDC_CRT2,
      DDC_LCD,
