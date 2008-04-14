@@ -1,4 +1,3 @@
-
 Summary:	X.org video drivers for ATI adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI
 Name:		xorg-driver-video-ati
@@ -16,6 +15,7 @@ BuildRequires:	automake
 BuildRequires:	libdrm-devel >= 2.0
 BuildRequires:	libtool
 BuildRequires:	pkgconfig >= 1:0.19
+BuildRequires:	rpmbuild(macros) >= 1.389
 BuildRequires:	xorg-proto-fontsproto-devel
 BuildRequires:	xorg-proto-randrproto-devel
 BuildRequires:	xorg-proto-renderproto-devel
@@ -26,7 +26,6 @@ BuildRequires:	xorg-proto-xf86miscproto-devel
 BuildRequires:	xorg-proto-xineramaproto-devel
 BuildRequires:	xorg-util-util-macros >= 0.99.2
 BuildRequires:	xorg-xserver-server-devel >= 1.1.0
-BuildRequires:  rpmbuild(macros) >= 1.389
 %requires_xorg_xserver_videodrv
 Requires:	xorg-xserver-server >= 1.1.0
 Obsoletes:	X11-driver-ati < 1:7.0.0
