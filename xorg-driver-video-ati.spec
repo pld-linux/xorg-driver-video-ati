@@ -38,7 +38,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 X.org video drivers for ATI Radeon adapters; supports PCI and AGP
 video cards based on the following ATI chips:
 - R100 (Radeon 7200),
-- RV100 (Radeon 7000(VE), M6),
+- RV100 (Radeon 7000(VE), M6, RN50/ES1000),
 - RS100 (Radeon IGP320(M)),
 - RV200 (Radeon 7500, M7, FireGL 7800),
 - RS200 (Radeon IGP330(M)/IGP340(M)),
@@ -48,27 +48,32 @@ video cards based on the following ATI chips:
 - RS300 (Radeon 9100 IGP),
 - RS350 (Radeon 9200 IGP),
 - RS400 (Radeon XPRESS 200/200M IGP),
-- RV280 (Radeon 9200PRO/9200/9200SE, M9+)
-
-Additionally it partially (2D only) supports video cards based on the
-following chips:
+- RV280 (Radeon 9200PRO/9200/9200SE, M9+),
 - R300 (Radeon 9700PRO/9700/9500PRO/9500/9600TX, FireGL X1/Z1),
 - R350 (Radeon 9800PRO/9800SE/9800, FireGL X2),
 - R360 (Radeon 9800XT),
 - RV350 (Radeon 9600PRO/9600SE/9600, M10/M11, FireGL T2),
 - RV360 (Radeon 9600XT),
 - RV370 (Radeon X300, M22),
-- RV380 (Radeon X600),
+- RV380 (Radeon X600, M24),
 - RV410 (Radeon X700, M26 PCIE),
 - R420 (Radeon X800 AGP),
 - R423/R430 (Radeon X800, M28 PCIE),
-- R480/R481 (Radeon X850 PCIE/AGP).
+- R480/R481 (Radeon X850 PCIE/AGP),
+- RV515 (Radeon X1300/X1400/X1500),
+- R520 (Radeon X1800),
+- RV530/RV560 (Radeon X1600/X1650/X1700),
+- RV570/R580 (Radeon X1900/X1950),
+- RS600/RS690 (Radeon X1200),
+- R600 (Radeon HD 2900),
+- RV610/RV630 (Radeon HD 2400/2600),
+- RV670 (Radeon HD 3850/3870).
 
 %description -l pl.UTF-8
 Sterownik obrazu X.org do kart graficznych ATI Radeon; obsługuje karty
 graficzne PCI i AGP oparte na następujących układach ATI:
 - R100 (Radeon 7200),
-- RV100 (Radeon 7000(VE), M6),
+- RV100 (Radeon 7000(VE), M6, RN50/ES1000),
 - RS100 (Radeon IGP320(M)),
 - RV200 (Radeon 7500, M7, FireGL 7800),
 - RS200 (Radeon IGP330(M)/IGP340(M)),
@@ -78,10 +83,7 @@ graficzne PCI i AGP oparte na następujących układach ATI:
 - RS300 (Radeon 9100 IGP),
 - RS350 (Radeon 9200 IGP),
 - RS400 (Radeon XPRESS 200/200M IGP),
-- RV280 (Radeon 9200PRO/9200/9200SE, M9+)
-
-Ponadto częściowo (tylko 2D) obsługuje karty oparte na następujących
-układach:
+- RV280 (Radeon 9200PRO/9200/9200SE, M9+),
 - R300 (Radeon 9700PRO/9700/9500PRO/9500/9600TX, FireGL X1/Z1),
 - R350 (Radeon 9800PRO/9800SE/9800, FireGL X2),
 - R360 (Radeon 9800XT),
@@ -92,7 +94,15 @@ układach:
 - RV410 (Radeon X700, M26 PCIE),
 - R420 (Radeon X800 AGP),
 - R423/R430 (Radeon X800, M28 PCIE),
-- R480/R481 (Radeon X850 PCIE/AGP).
+- R480/R481 (Radeon X850 PCIE/AGP),
+- RV515 (Radeon X1300/X1400/X1500),
+- R520 (Radeon X1800),
+- RV530/RV560 (Radeon X1600/X1650/X1700),
+- RV570/R580 (Radeon X1900/X1950),
+- RS600/RS690 (Radeon X1200),
+- R600 (Radeon HD 2900),
+- RV610/RV630 (Radeon HD 2400/2600),
+- RV670 (Radeon HD 3850/3870).
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
