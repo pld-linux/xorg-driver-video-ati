@@ -1,5 +1,5 @@
-Summary:	X.org video drivers for ATI adapters
-Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI
+Summary:	X.org video drivers for ATI Radeon adapters
+Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
 Version:	6.8.191
 Release:	1
@@ -35,38 +35,64 @@ Obsoletes:	XFree86-driver-radeon < 1:7.0.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-X.org video drivers for ATI radeon adapter: supports PCI and AGP video
-cards based on the following ATI chips: R100 (Radeon 7200), RV100
-(Radeon 7000(VE), M6), RS100 (Radeon IGP320(M)), RV200 (Radeon 7500,
-M7, FireGL 7800), RS200 (Radeon IGP330(M)/IGP340(M)), RS250 (Radeon
-Mobility 7000 IGP), R200 (Radeon 8500, 9100, FireGL 8800/8700), RV250
-(Radeon 9000PRO/9000, M9), RS300 (Radeon 9100 IGP), RS350 (Radeon 9200
-IGP), RS400 (Radeon XPRESS 200/200M IGP), RV280 (Radeon 9200PRO/9200/
-9200SE, M9+); additionally it partially (2D only) supports video cards
-based on the following chips: R300 (Radeon 9700PRO/9700/
-9500PRO/9500/9600TX, FireGL X1/Z1), R350 (Radeon 9800PRO/9800SE/ 9800,
-FireGL X2), R360 (Radeon 9800XT), RV350 (Radeon 9600PRO/ 9600SE/9600,
-M10/M11, FireGL T2), RV360 (Radeon 9600XT), RV370 (Radeon X300, M22),
-RV380 (Radeon X600), RV410 (Radeon X700, M26 PCIE), R420 (Radeon X800
-AGP), R423/R430 (Radeon X800, M28 PCIE), R480/R481 (Radeon X850
-PCIE/AGP).
+X.org video drivers for ATI Radeon adapters; supports PCI and AGP
+video cards based on the following ATI chips:
+- R100 (Radeon 7200),
+- RV100 (Radeon 7000(VE), M6),
+- RS100 (Radeon IGP320(M)),
+- RV200 (Radeon 7500, M7, FireGL 7800),
+- RS200 (Radeon IGP330(M)/IGP340(M)),
+- RS250 (Radeon Mobility 7000 IGP),
+- R200 (Radeon 8500, 9100, FireGL 8800/8700),
+- RV250 (Radeon 9000PRO/9000, M9),
+- RS300 (Radeon 9100 IGP),
+- RS350 (Radeon 9200 IGP),
+- RS400 (Radeon XPRESS 200/200M IGP),
+- RV280 (Radeon 9200PRO/9200/9200SE, M9+)
+
+Additionally it partially (2D only) supports video cards based on the
+following chips:
+- R300 (Radeon 9700PRO/9700/9500PRO/9500/9600TX, FireGL X1/Z1),
+- R350 (Radeon 9800PRO/9800SE/9800, FireGL X2),
+- R360 (Radeon 9800XT),
+- RV350 (Radeon 9600PRO/9600SE/9600, M10/M11, FireGL T2),
+- RV360 (Radeon 9600XT),
+- RV370 (Radeon X300, M22),
+- RV380 (Radeon X600),
+- RV410 (Radeon X700, M26 PCIE),
+- R420 (Radeon X800 AGP),
+- R423/R430 (Radeon X800, M28 PCIE),
+- R480/R481 (Radeon X850 PCIE/AGP).
 
 %description -l pl.UTF-8
-Sterownik obrazu X.org do kart graficznych ATI radeon: obsługujący
-karty graficzne PCI i AGP oparte na następujących układach ATI: R100
-(Radeon 7200), RV100 (Radeon 7000(VE), M6), RS100 (Radeon IGP320(M)),
-RV200 (Radeon 7500, M7, FireGL 7800), RS200 (Radeon
-IGP330(M)/IGP340(M)), RS250 (Radeon Mobility 7000 IGP), R200 (Radeon
-8500, 9100, FireGL 8800/8700), RV250 (Radeon 9000PRO/9000, M9), RS300
-(Radeon 9100 IGP), RS350 (Radeon 9200 IGP), RS400 (Radeon XPRESS
-200/200M IGP), RV280 (Radeon 9200PRO/9200/9200SE, M9+); a ponadto
-częściowo (tylko 2D) obsługujący karty oparte na następujących
-układach: R300 (Radeon 9700PRO/9700/9500PRO/9500/9600TX, FireGL
-X1/Z1), R350 (Radeon 9800PRO/9800SE/9800, FireGL X2), R360 (Radeon
-9800XT), RV350 (Radeon 9600PRO/9600SE/9600, M10/M11, FireGL T2), RV360
-(Radeon 9600XT), RV370 (Radeon X300, M22), RV380 (Radeon X600), RV410
-(Radeon X700, M26 PCIE), R420 (Radeon X800 AGP), R423/R430 (Radeon
-X800, M28 PCIE), R480/R481 (Radeon X850 PCIE/AGP).
+Sterownik obrazu X.org do kart graficznych ATI Radeon; obsługuje karty
+graficzne PCI i AGP oparte na następujących układach ATI:
+- R100 (Radeon 7200),
+- RV100 (Radeon 7000(VE), M6),
+- RS100 (Radeon IGP320(M)),
+- RV200 (Radeon 7500, M7, FireGL 7800),
+- RS200 (Radeon IGP330(M)/IGP340(M)),
+- RS250 (Radeon Mobility 7000 IGP),
+- R200 (Radeon 8500, 9100, FireGL 8800/8700),
+- RV250 (Radeon 9000PRO/9000, M9),
+- RS300 (Radeon 9100 IGP),
+- RS350 (Radeon 9200 IGP),
+- RS400 (Radeon XPRESS 200/200M IGP),
+- RV280 (Radeon 9200PRO/9200/9200SE, M9+)
+
+Ponadto częściowo (tylko 2D) obsługuje karty oparte na następujących
+układach:
+- R300 (Radeon 9700PRO/9700/9500PRO/9500/9600TX, FireGL X1/Z1),
+- R350 (Radeon 9800PRO/9800SE/9800, FireGL X2),
+- R360 (Radeon 9800XT),
+- RV350 (Radeon 9600PRO/9600SE/9600, M10/M11, FireGL T2),
+- RV360 (Radeon 9600XT),
+- RV370 (Radeon X300, M22),
+- RV380 (Radeon X600),
+- RV410 (Radeon X700, M26 PCIE),
+- R420 (Radeon X800 AGP),
+- R423/R430 (Radeon X800, M28 PCIE),
+- R480/R481 (Radeon X850 PCIE/AGP).
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
