@@ -67,7 +67,9 @@ video cards based on the following ATI chips:
 - RS600/RS690 (Radeon X1200),
 - R600 (Radeon HD 2900),
 - RV610/RV630 (Radeon HD 2400/2600),
-- RV670 (Radeon HD 3850/3870).
+- RV670 (Radeon HD 3850/3870),
+- RV620/RV635 (Radeon HD 3450/3470),
+- RS780 (Radeon HD 3200).
 
 %description -l pl.UTF-8
 Sterownik obrazu X.org do kart graficznych ATI Radeon; obsługuje karty
@@ -102,7 +104,9 @@ graficzne PCI i AGP oparte na następujących układach ATI:
 - RS600/RS690 (Radeon X1200),
 - R600 (Radeon HD 2900),
 - RV610/RV630 (Radeon HD 2400/2600),
-- RV670 (Radeon HD 3850/3870).
+- RV670 (Radeon HD 3850/3870),
+- RV620/RV635 (Radeon HD 3450/3470),
+- RS780 (Radeon HD 3200).
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
