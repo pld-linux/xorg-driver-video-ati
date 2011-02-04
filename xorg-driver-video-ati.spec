@@ -9,7 +9,7 @@ Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%
 # Source0-md5:	b64bf8939f9f8fb518baf858f8b6ca73
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
-BuildRequires:	autoconf >= 2.57
+BuildRequires:	autoconf >= 2.60
 BuildRequires:	automake
 BuildRequires:	libdrm-devel >= 2.2
 BuildRequires:	libtool
@@ -23,7 +23,7 @@ BuildRequires:	xorg-proto-renderproto-devel
 BuildRequires:	xorg-proto-videoproto-devel
 BuildRequires:	xorg-proto-xextproto-devel >= 7.0.99.1
 BuildRequires:	xorg-proto-xf86driproto-devel
-BuildRequires:	xorg-util-util-macros >= 1.3
+BuildRequires:	xorg-util-util-macros >= 1.8
 BuildRequires:	xorg-xserver-server-devel >= 1.6.2
 %{?requires_xorg_xserver_videodrv}
 Requires:	xorg-xserver-libdri >= 1.6.2
@@ -72,9 +72,16 @@ video cards based on the following ATI chips:
 - RV620/RV635 (Radeon HD 3450/3470),
 - RV670 (Radeon HD 3850/3870),
 - RS780 (Radeon HD 3100/3200/3300),
+- RS880 (Radeon HD 4100/4200/4290),
 - RV710 (Radeon HD 4350/4550),
 - RV730 (Radeon HD 4650/4670),
-- RV770 (Radeon HD 4850/4870).
+- RV770 (Radeon HD 4850/4870),
+- CEDAR (Radeon HD 5450),
+- REDWOOD (Radeon HD 5550/5570/5670),
+- JUNIPER (Radeon HD 5750/5770),
+- CYPRESS (Radeon HD 5850/5870),
+- HEMLOCK (Radeon HD 5970),
+- PALM (Radeon HD 6310/6250).
 
 %description -l pl.UTF-8
 Sterownik obrazu X.org do kart graficznych ATI Radeon; obsługuje karty
@@ -112,9 +119,16 @@ graficzne PCI i AGP oparte na następujących układach ATI:
 - RV620/RV635 (Radeon HD 3450/3470),
 - RV670 (Radeon HD 3850/3870),
 - RS780 (Radeon HD 3100/3200/3300),
+- RS880 (Radeon HD 4100/4200/4290),
 - RV710 (Radeon HD 4350/4550),
 - RV730 (Radeon HD 4650/4670),
-- RV770 (Radeon HD 4850/4870).
+- RV770 (Radeon HD 4850/4870),
+- CEDAR (Radeon HD 5450),
+- REDWOOD (Radeon HD 5550/5570/5670),
+- JUNIPER (Radeon HD 5750/5770),
+- CYPRESS (Radeon HD 5850/5870),
+- HEMLOCK (Radeon HD 5970),
+- PALM (Radeon HD 6310/6250).
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
@@ -135,7 +149,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-rm -f $RPM_BUILD_ROOT%{_libdir}/xorg/modules/*/*.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/xorg/modules/*/*.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
