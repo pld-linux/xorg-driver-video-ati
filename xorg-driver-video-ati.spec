@@ -7,6 +7,7 @@ License:	MIT
 Group:		X11/Applications
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
 # Source0-md5:	b64bf8939f9f8fb518baf858f8b6ca73
+Patch0:		xf86-video-ati-6.14.0-xorg-server-1.10.patch
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.60
@@ -132,6 +133,7 @@ graficzne PCI i AGP oparte na następujących układach ATI:
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
+%patch0 -p1
 
 %build
 %{__libtoolize}
