@@ -1,13 +1,12 @@
 Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
-Version:	6.14.0
-Release:	3
+Version:	6.14.1
+Release:	1
 License:	MIT
 Group:		X11/Applications
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	b64bf8939f9f8fb518baf858f8b6ca73
-Patch0:		xf86-video-ati-6.14.0-xorg-server-1.10.patch
+# Source0-md5:	395e23ad026e4246dd70bbd2143688b5
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.60
@@ -133,7 +132,6 @@ graficzne PCI i AGP oparte na następujących układach ATI:
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
-%patch0 -p1
 
 %build
 %{__libtoolize}
