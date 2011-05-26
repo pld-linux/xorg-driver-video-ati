@@ -81,7 +81,11 @@ video cards based on the following ATI chips:
 - JUNIPER (Radeon HD 5750/5770),
 - CYPRESS (Radeon HD 5850/5870),
 - HEMLOCK (Radeon HD 5970),
-- PALM (Radeon HD 6310/6250).
+- PALM (Radeon HD 6310/6250),
+- BARTS (Radeon HD 6850/6870),
+- TURKS (Radeon HD 6570/6670),
+- CAICOS (Radeon HD 6450),
+- CAYMAN (Radeon HD 6950/6970/6990).
 
 %description -l pl.UTF-8
 Sterownik obrazu X.org do kart graficznych ATI Radeon; obsługuje karty
@@ -128,7 +132,11 @@ graficzne PCI i AGP oparte na następujących układach ATI:
 - JUNIPER (Radeon HD 5750/5770),
 - CYPRESS (Radeon HD 5850/5870),
 - HEMLOCK (Radeon HD 5970),
-- PALM (Radeon HD 6310/6250).
+- PALM (Radeon HD 6310/6250),
+- BARTS (Radeon HD 6850/6870),
+- TURKS (Radeon HD 6570/6670),
+- CAICOS (Radeon HD 6450),
+- CAYMAN (Radeon HD 6950/6970/6990).
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
