@@ -40,8 +40,14 @@ Conflicts:	vbetool
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-X.org video drivers for ATI Radeon adapters; supports PCI and AGP
-video cards based on the following ATI chips:
+This package contains X.org drivers for ATI video adapters:
+- "ati" wrapper driver, which automatically loads proper driver
+  depending on hardware: radeon (included in this package),
+  r128 (included in xorg-driver-video-r128 package), mach64
+  (included in xorg-driver-video-mach64 package);
+- "radeon" driver for ATI Radeon adapters.
+The "radeon" driver supports PCI and AGP video cards based on the
+following ATI chips:
 - R100 (Radeon 7200),
 - RV100 (Radeon 7000(VE), M6, RN50/ES1000),
 - RS100 (Radeon IGP320(M)),
@@ -87,11 +93,18 @@ video cards based on the following ATI chips:
 - BARTS (Radeon HD 6790/6850/6870/6950/6970/6990),
 - TURKS (Radeon HD 6570/6630/6650/6670/6730/6750/6770),
 - CAICOS (Radeon HD 6430/6450/6470/6490),
-- CAYMAN (Radeon HD 6950/6970/6990).
+- CAYMAN (Radeon HD 6950/6970/6990),
+- ARUBA.
 
 %description -l pl.UTF-8
-Sterownik obrazu X.org do kart graficznych ATI Radeon; obsługuje karty
-graficzne PCI i AGP oparte na następujących układach ATI:
+Ten pakiet zawiera sterowniki obrazu X.org do kart graficznych ATI:
+- sterownik obudowujący "ati", który automatycznie wczytuje właściwy
+  sterownik w zależności od sprzętu: radeon (załączony w tym
+  pakiecie), r128 (z pakietu xorg-driver-video-r128), mach64 (z
+  pakietu xorg-driver-video-mach64);
+- sterownik "radeon" do kart ATI Radeon.
+Sterownik "radeon" obsługuje karty graficzne PCI i AGP oparte na
+następujących układach ATI:
 - R100 (Radeon 7200),
 - RV100 (Radeon 7000(VE), M6, RN50/ES1000),
 - RS100 (Radeon IGP320(M)),
@@ -137,7 +150,8 @@ graficzne PCI i AGP oparte na następujących układach ATI:
 - BARTS (Radeon HD 6790/6850/6870/6950/6970/6990),
 - TURKS (Radeon HD 6570/6630/6650/6670/6730/6750/6770),
 - CAICOS (Radeon HD 6430/6450/6470/6490),
-- CAYMAN (Radeon HD 6950/6970/6990).
+- CAYMAN (Radeon HD 6950/6970/6990),
+- ARUBA.
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
