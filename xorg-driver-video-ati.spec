@@ -1,19 +1,17 @@
 Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
-Version:	6.14.3
-Release:	3
+Version:	6.14.4
+Release:	1
 License:	MIT
 Group:		X11/Applications
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	19126c8421a05d9605883dcf7498d876
-Patch0:		xorg_list.patch
-Patch1:		vgahw.patch
+# Source0-md5:	17dd4f0bf4dbe9839e5f7d1161994222
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.60
 BuildRequires:	automake
-BuildRequires:	libdrm-devel >= 2.2
+BuildRequires:	libdrm-devel >= 2.4.33
 BuildRequires:	libtool
 BuildRequires:	pkgconfig >= 1:0.19
 BuildRequires:	rpmbuild(macros) >= 1.389
@@ -28,6 +26,7 @@ BuildRequires:	xorg-proto-xf86driproto-devel
 BuildRequires:	xorg-util-util-macros >= 1.8
 BuildRequires:	xorg-xserver-server-devel >= 1.6.2
 %{?requires_xorg_xserver_videodrv}
+Requires:	libdrm >= 2.4.33
 Requires:	xorg-xserver-libdri >= 1.6.2
 Requires:	xorg-xserver-libglx >= 1.6.2
 Requires:	xorg-xserver-server >= 1.6.2
@@ -142,8 +141,6 @@ graficzne PCI i AGP oparte na następujących układach ATI:
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
-%patch0 -p1
-%patch1 -p1
 
 %build
 %{__libtoolize}
