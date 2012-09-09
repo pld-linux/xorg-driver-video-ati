@@ -1,13 +1,15 @@
 %define	libdrm_ver	2.4.36
+%define	snap		20120909
 Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
-Version:	6.14.6
-Release:	3
+Version:	6.99.99
+Release:	1
 License:	MIT
 Group:		X11/Applications
-Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	3e945273edd3b8beb96bd40f7929d450
+#Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
+Source0:	xf86-video-ati-%{snap}.tar.bz2
+# Source0-md5:	7262d4484e678c868e6b4adbfa4631d9
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.60
@@ -155,9 +157,11 @@ następujących układach ATI:
 - ARUBA.
 
 %prep
-%setup -q -n xf86-video-ati-%{version}
+#%%setup -q -n xf86-video-ati-%{version}
+%setup -q -n xf86-video-ati
 
 %build
+[ -f autogen.sh ] && ./autogen.sh
 %{__libtoolize}
 %{__aclocal}
 %{__autoconf}
@@ -183,8 +187,5 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING ChangeLog README
 %attr(755,root,root) %{_libdir}/xorg/modules/drivers/ati_drv.so
 %attr(755,root,root) %{_libdir}/xorg/modules/drivers/radeon_drv.so
-%attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre200_drv.so
-%attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre_detect_drv.so
-%attr(755,root,root) %{_libdir}/xorg/modules/multimedia/theatre_drv.so
 %{_mandir}/man4/ati.4*
 %{_mandir}/man4/radeon.4*
