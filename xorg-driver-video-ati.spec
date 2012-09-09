@@ -4,7 +4,7 @@ Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
 Version:	6.99.99
-Release:	1
+Release:	2
 License:	MIT
 Group:		X11/Applications
 #Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
@@ -184,7 +184,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc COPYING ChangeLog README
+%doc COPYING README
+#%doc ChangeLog
 %attr(755,root,root) %{_libdir}/xorg/modules/drivers/ati_drv.so
 %attr(755,root,root) %{_libdir}/xorg/modules/drivers/radeon_drv.so
 %{_mandir}/man4/ati.4*
