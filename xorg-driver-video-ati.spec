@@ -1,15 +1,13 @@
 %define	libdrm_ver	2.4.36
-%define	snap		20120923
 Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
-Version:	6.99.99
-Release:	5
+Version:	7.0.0
+Release:	1
 License:	MIT
 Group:		X11/Applications
-#Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
-Source0:	xf86-video-ati-%{snap}.tar.bz2
-# Source0-md5:	1750aa7feffdbc1e65854af2daaed2f4
+Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
+# Source0-md5:	7498971865dc465a4d4ebad826663d40
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.60
@@ -157,8 +155,7 @@ następujących układach ATI:
 - ARUBA.
 
 %prep
-#%%setup -q -n xf86-video-ati-%{version}
-%setup -q -n xf86-video-ati
+%setup -q -n xf86-video-ati-%{version}
 
 %build
 [ -f autogen.sh ] && ./autogen.sh
