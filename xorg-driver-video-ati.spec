@@ -1,3 +1,7 @@
+#
+# Conditional build:
+%bcond_with	glamor		# glamor, new GL-based acceleration
+#
 %define	libdrm_ver	2.4.36
 Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
@@ -12,6 +16,7 @@ URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.60
 BuildRequires:	automake
+%{?with_glamor:BuildRequires:	glamor-devel >= 0.3.1}
 BuildRequires:	libdrm-devel >= %{libdrm_ver}
 BuildRequires:	libtool
 BuildRequires:	pkgconfig >= 1:0.19
@@ -25,12 +30,13 @@ BuildRequires:	xorg-proto-videoproto-devel
 BuildRequires:	xorg-proto-xextproto-devel >= 7.0.99.1
 BuildRequires:	xorg-proto-xf86driproto-devel
 BuildRequires:	xorg-util-util-macros >= 1.8
-BuildRequires:	xorg-xserver-server-devel >= 1.6.2
+BuildRequires:	xorg-xserver-server-devel >= 1.7
 %{?requires_xorg_xserver_videodrv}
+%{?with_glamor:Requires:	glamor >= 0.3.1}
 Requires:	libdrm >= %{libdrm_ver}
-Requires:	xorg-xserver-libdri >= 1.6.2
-Requires:	xorg-xserver-libglx >= 1.6.2
-Requires:	xorg-xserver-server >= 1.6.2
+Requires:	xorg-xserver-libdri >= 1.7
+Requires:	xorg-xserver-libglx >= 1.7
+Requires:	xorg-xserver-server >= 1.7
 Provides:	xorg-driver-video
 Obsoletes:	X11-driver-ati < 1:7.0.0
 Obsoletes:	X11-driver-radeon < 1:7.0.0
@@ -158,13 +164,13 @@ następujących układach ATI:
 %setup -q -n xf86-video-ati-%{version}
 
 %build
-[ -f autogen.sh ] && ./autogen.sh
 %{__libtoolize}
 %{__aclocal}
 %{__autoconf}
 %{__autoheader}
 %{__automake}
-%configure
+%configure \
+	%{?with_glamor:--enable-glamor}
 
 %{__make}
 
