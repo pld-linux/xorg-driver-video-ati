@@ -1,22 +1,22 @@
 #
 # Conditional build:
-%bcond_with	glamor		# glamor, new GL-based acceleration
+%bcond_without	glamor		# glamor, new GL-based acceleration
 #
 %define	libdrm_ver	2.4.46
 Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
-Version:	7.2.0
-Release:	2
+Version:	7.3.0
+Release:	1
 License:	MIT
 Group:		X11/Applications
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	5ab9a826699e5c86ef89fca43ebb3821
+# Source0-md5:	f36383c590d56a9304e5cab4813a6653
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.60
 BuildRequires:	automake
-%{?with_glamor:BuildRequires:	glamor-devel >= 0.3.1}
+%{?with_glamor:BuildRequires:	glamor-devel >= 0.6.0}
 BuildRequires:	libdrm-devel >= %{libdrm_ver}
 BuildRequires:	libtool
 BuildRequires:	pkgconfig >= 1:0.19
@@ -32,7 +32,7 @@ BuildRequires:	xorg-proto-xf86driproto-devel
 BuildRequires:	xorg-util-util-macros >= 1.8
 BuildRequires:	xorg-xserver-server-devel >= 1.7
 %{?requires_xorg_xserver_videodrv}
-%{?with_glamor:Requires:	glamor >= 0.3.1}
+%{?with_glamor:Requires:	glamor >= 0.6.0}
 Requires:	libdrm >= %{libdrm_ver}
 Requires:	xorg-xserver-libdri >= 1.7
 Requires:	xorg-xserver-libglx >= 1.7
