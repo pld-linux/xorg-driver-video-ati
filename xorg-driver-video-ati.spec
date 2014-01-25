@@ -101,7 +101,16 @@ following ATI chips:
 - TURKS (Radeon HD 6570/6630/6650/6670/6730/6750/6770),
 - CAICOS (Radeon HD 6430/6450/6470/6490),
 - CAYMAN (Radeon HD 6950/6970/6990),
-- ARUBA.
+- ARUBA (Radeon HD 7000 series),
+- TAHITI (Radeon HD 7900 series),
+- PITCAIRN (Radeon HD 7800 series),
+- VERDE (Radeon HD 7700 series),
+- OLAND (Radeon HD 8000 series),
+- HAINAN (Radeon HD 8000 series),
+- BONAIRE (Radeon HD 7790 series),
+- KAVERI (APU),
+- KABINI (APU),
+- HAWAII (Radeon R9 series).
 
 %description -l pl.UTF-8
 Ten pakiet zawiera sterowniki obrazu X.org do kart graficznych ATI:
@@ -158,7 +167,16 @@ następujących układach ATI:
 - TURKS (Radeon HD 6570/6630/6650/6670/6730/6750/6770),
 - CAICOS (Radeon HD 6430/6450/6470/6490),
 - CAYMAN (Radeon HD 6950/6970/6990),
-- ARUBA.
+- ARUBA (Radeon HD z serii 7000),
+- TAHITI (Radeon HD z serii 7900),
+- PITCAIRN (Radeon HD z serii 7800),
+- VERDE (Radeon HD z serii 7700),
+- OLAND (Radeon HD z serii 8000),
+- HAINAN (Radeon HD z serii 8000),
+- BONAIRE (Radeon HD z serii 7790),
+- KAVERI (APU),
+- KABINI (APU),
+- HAWAII (Radeon z serii R9).
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
@@ -170,7 +188,7 @@ następujących układach ATI:
 %{__autoheader}
 %{__automake}
 %configure \
-	%{?with_glamor:--enable-glamor}
+	%{!?with_glamor:--disable-glamor}
 
 %{__make}
 
@@ -187,8 +205,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc COPYING README
-#%doc ChangeLog
+%doc COPYING ChangeLog README
 %attr(755,root,root) %{_libdir}/xorg/modules/drivers/ati_drv.so
 %attr(755,root,root) %{_libdir}/xorg/modules/drivers/radeon_drv.so
 %{_mandir}/man4/ati.4*
