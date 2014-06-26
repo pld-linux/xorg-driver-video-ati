@@ -2,7 +2,7 @@
 # Conditional build:
 %bcond_without	glamor		# glamor, new GL-based acceleration
 #
-%define	libdrm_ver	2.4.46
+%define	libdrm_ver	2.4.54
 Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
