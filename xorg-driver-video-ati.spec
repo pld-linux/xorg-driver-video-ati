@@ -6,12 +6,12 @@
 Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
-Version:	7.6.1
-Release:	2
+Version:	7.7.0
+Release:	1
 License:	MIT
 Group:		X11/Applications
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	ede86cd3d1b1d8882f0aea61d9e924ed
+# Source0-md5:	59bfe0feba875c5cd28b03766aaa3b98
 URL:		http://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.60
@@ -30,13 +30,13 @@ BuildRequires:	xorg-proto-videoproto-devel
 BuildRequires:	xorg-proto-xextproto-devel >= 7.0.99.1
 BuildRequires:	xorg-proto-xf86driproto-devel
 BuildRequires:	xorg-util-util-macros >= 1.8
-BuildRequires:	xorg-xserver-server-devel >= 1.7
+BuildRequires:	xorg-xserver-server-devel >= 1.9
 %{?requires_xorg_xserver_videodrv}
 %{?with_glamor:Requires:	xorg-xserver-server >= 1.16.0}
 Requires:	libdrm >= %{libdrm_ver}
-Requires:	xorg-xserver-libdri >= 1.7
-Requires:	xorg-xserver-libglx >= 1.7
-Requires:	xorg-xserver-server >= 1.7
+Requires:	xorg-xserver-libdri >= 1.9
+Requires:	xorg-xserver-libglx >= 1.9
+Requires:	xorg-xserver-server >= 1.9
 Provides:	xorg-driver-video
 Obsoletes:	X11-driver-ati < 1:7.0.0
 Obsoletes:	X11-driver-radeon < 1:7.0.0
