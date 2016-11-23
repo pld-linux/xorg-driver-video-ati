@@ -16,7 +16,6 @@ URL:		https://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	autoconf >= 2.60
 BuildRequires:	automake
-%{?with_glamor:BuildRequires:	xorg-xserver-server-devel >= 1.16.0}
 BuildRequires:	libdrm-devel >= %{libdrm_ver}
 BuildRequires:	libtool
 BuildRequires:	pkgconfig >= 1:0.19
@@ -29,14 +28,16 @@ BuildRequires:	xorg-proto-renderproto-devel
 BuildRequires:	xorg-proto-videoproto-devel
 BuildRequires:	xorg-proto-xextproto-devel >= 7.0.99.1
 BuildRequires:	xorg-proto-xf86driproto-devel
+BuildRequires:	xorg-proto-xproto-devel
 BuildRequires:	xorg-util-util-macros >= 1.8
-BuildRequires:	xorg-xserver-server-devel >= 1.9
+BuildRequires:	xorg-xserver-server-devel >= 1.10
+%{?with_glamor:BuildRequires:	xorg-xserver-server-devel >= 1.16.0}
 %{?requires_xorg_xserver_videodrv}
-%{?with_glamor:Requires:	xorg-xserver-server >= 1.16.0}
 Requires:	libdrm >= %{libdrm_ver}
-Requires:	xorg-xserver-libdri >= 1.9
-Requires:	xorg-xserver-libglx >= 1.9
-Requires:	xorg-xserver-server >= 1.9
+Requires:	xorg-xserver-libdri >= 1.10
+Requires:	xorg-xserver-libglx >= 1.10
+Requires:	xorg-xserver-server >= 1.10
+%{?with_glamor:Requires:	xorg-xserver-server >= 1.16.0}
 Provides:	xorg-driver-video
 Obsoletes:	X11-driver-ati < 1:7.0.0
 Obsoletes:	X11-driver-radeon < 1:7.0.0
@@ -110,7 +111,8 @@ following ATI chips:
 - BONAIRE (Radeon HD 7790 series),
 - KAVERI (APU),
 - KABINI (APU),
-- HAWAII (Radeon R9 series).
+- HAWAII (Radeon R9 series),
+- MULLINS (APU).
 
 %description -l pl.UTF-8
 Ten pakiet zawiera sterowniki obrazu X.org do kart graficznych ATI:
@@ -176,7 +178,8 @@ następujących układach ATI:
 - BONAIRE (Radeon HD z serii 7790),
 - KAVERI (APU),
 - KABINI (APU),
-- HAWAII (Radeon z serii R9).
+- HAWAII (Radeon z serii R9),
+- MULLINS (APU).
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
