@@ -1,0 +1,11 @@
+--- xf86-video-ati-19.1.0/src/drmmode_display.h~	2019-10-15 18:16:29.000000000 +0200
++++ xf86-video-ati-19.1.0/src/drmmode_display.h	2021-11-03 16:18:06.074327806 +0100
+@@ -262,7 +262,7 @@
+ 			 uint64_t *ust, uint32_t *result_seq);
+ 
+ 
+-miPointerSpriteFuncRec drmmode_sprite_funcs;
++extern miPointerSpriteFuncRec drmmode_sprite_funcs;
+ 
+ 
+ #endif
