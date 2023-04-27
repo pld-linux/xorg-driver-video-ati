@@ -6,14 +6,12 @@
 Summary:	X.org video drivers for ATI Radeon adapters
 Summary(pl.UTF-8):	Sterowniki obrazu X.org do kart graficznych ATI Radeon
 Name:		xorg-driver-video-ati
-Version:	19.1.0
-Release:	3
+Version:	22.0.0
+Release:	1
 License:	MIT
 Group:		X11/Applications
-Source0:	https://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.bz2
-# Source0-md5:	6e49d3c2839582af415ceded76e626e6
-Patch0:		pc.patch
-Patch1:		gcc10.patch
+Source0:	https://xorg.freedesktop.org/releases/individual/driver/xf86-video-ati-%{version}.tar.xz
+# Source0-md5:	33c7b049c526aa9bf3654890c4d7b860
 URL:		https://xorg.freedesktop.org/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	Mesa-libgbm-devel >= 10.6
@@ -23,6 +21,7 @@ BuildRequires:	libdrm-devel >= %{libdrm_ver}
 BuildRequires:	libtool
 BuildRequires:	pkgconfig >= 1:0.19
 BuildRequires:	rpmbuild(macros) >= 1.389
+BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
 BuildRequires:	xorg-lib-libpciaccess-devel >= 0.8.0
 BuildRequires:	xorg-proto-fontsproto-devel
@@ -33,19 +32,18 @@ BuildRequires:	xorg-proto-xextproto-devel >= 7.0.99.1
 BuildRequires:	xorg-proto-xf86driproto-devel
 BuildRequires:	xorg-proto-xproto-devel
 BuildRequires:	xorg-util-util-macros >= 1.8
-BuildRequires:	xorg-xserver-server-devel >= 1.13
-%{?with_glamor:BuildRequires:	xorg-xserver-server-devel >= 1.16.0}
+BuildRequires:	xorg-xserver-server-devel >= 1.16
+BuildRequires:	xz
 %{?requires_xorg_xserver_videodrv}
 Requires:	Mesa-libgbm >= 10.6
 Requires:	libdrm >= %{libdrm_ver}
-Requires:	xorg-xserver-libdri >= 1.13
-Requires:	xorg-xserver-libglx >= 1.13
-Requires:	xorg-xserver-server >= 1.13
-%{?with_glamor:Requires:	xorg-xserver-server >= 1.16.0}
+Requires:	xorg-xserver-libdri >= 1.16
+Requires:	xorg-xserver-libglx >= 1.16
+Requires:	xorg-xserver-server >= 1.16
 Provides:	xorg-driver-video
 Obsoletes:	X11-driver-ati < 1:7.0.0
 Obsoletes:	X11-driver-radeon < 1:7.0.0
-Obsoletes:	XFree86-ATI
+Obsoletes:	XFree86-ATI < 4
 Obsoletes:	XFree86-driver-ati < 1:7.0.0
 Obsoletes:	XFree86-driver-radeon < 1:7.0.0
 Conflicts:	vbetool
@@ -187,8 +185,6 @@ następujących układach ATI:
 
 %prep
 %setup -q -n xf86-video-ati-%{version}
-%patch0 -p1
-%patch1 -p1
 
 %build
 %{__libtoolize}
